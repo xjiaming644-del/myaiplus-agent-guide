@@ -1,0 +1,1753 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MyAIPlus 严选 · 新代理入营与出单交互指南</title>
+<script>try{if(localStorage.getItem("pg-agent-theme-v1")==="dark")document.documentElement.dataset.theme="dark";}catch(e){}</script>
+<style>
+/* ===== Google Material 3 / Gemini Aesthetic · Light Default + Dark Mode ===== */
+:root{
+  color-scheme:light;
+  --bg:#ffffff;--paper:#ffffff;--soft:#f8fafd;--surface-1:#f8fafd;--surface-2:#f0f4f9;--surface-3:#e9eef6;--track:#e8eef7;
+  --ink:#1f1f1f;--text:#3c4043;--muted:#5f6368;--faint:#70757a;
+  --accent:#1a73e8;--accent-dark:#1557b0;--accent-ink:#0b57d0;--accent-soft:#e8f0fe;
+  --violet:#1a73e8;--violet-dark:#0b57d0;--green:#1e8e3e;--green-ink:#137333;--danger:#b3261e;
+  --lilac:#f3e8fd;--mint:#e6f4ea;--butter:#fef7e0;--sky:#e8f0fe;--peach:#fce8e6;
+  --stk-yellow:#fef7e0;--stk-mint:#e6f4ea;--stk-peach:#fce8e6;--stk-lilac:#f3e8fd;--stk-sky:#e8f0fe;
+  --border-color:#dadce0;--border-subtle:#e8eaed;
+  --line:1px solid var(--border-color);--line-thin:1px solid var(--border-subtle);
+  --r-card:20px;--r-mid:16px;--r-big:28px;
+  --shadow-1:0 1px 2px rgba(60,64,67,.08),0 1px 3px 1px rgba(60,64,67,.05);
+  --shadow-2:0 6px 20px rgba(60,64,67,.12),0 2px 6px rgba(60,64,67,.06);
+  --shadow-hover:0 10px 28px rgba(26,115,232,.12),0 3px 10px rgba(60,64,67,.08);
+  --gemini-grad:linear-gradient(135deg,#1a73e8 0%,#4285f4 42%,#8e54e9 78%,#d96570 100%);
+  --gemini-hero:radial-gradient(ellipse 80% 55% at 50% -10%,rgba(26,115,232,.10) 0%,rgba(142,84,233,.06) 45%,transparent 78%);
+  --font:"Google Sans","Inter","PingFang SC","Hiragino Sans GB","Microsoft YaHei UI","Noto Sans SC",system-ui,-apple-system,sans-serif;
+  --font-head:"Google Sans","Plus Jakarta Sans","Inter","PingFang SC","Microsoft YaHei UI","Noto Sans SC",system-ui,sans-serif;
+  --font-code:ui-monospace,"SFMono-Regular","JetBrains Mono","Cascadia Code",Consolas,monospace;
+  --ease-out:cubic-bezier(.2,.8,.2,1);
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#131314;--paper:#131314;--soft:#1e1f20;--surface-1:#1e1f20;--surface-2:#282a2c;--surface-3:#333537;--track:#282a2c;
+  --ink:#e3e3e3;--text:#c4c7c5;--muted:#9aa0a6;--faint:#8e918f;
+  --accent:#8ab4f8;--accent-dark:#a8c7fa;--accent-ink:#a8c7fa;--accent-soft:rgba(138,180,248,.14);
+  --violet:#8ab4f8;--violet-dark:#a8c7fa;--green:#81c995;--green-ink:#81c995;--danger:#f28b82;
+  --lilac:rgba(197,138,249,.12);--mint:rgba(129,201,149,.12);--butter:rgba(253,214,99,.12);--sky:rgba(138,180,248,.12);--peach:rgba(242,139,130,.12);
+  --stk-yellow:rgba(253,214,99,.18);--stk-mint:rgba(129,201,149,.18);--stk-peach:rgba(242,139,130,.18);--stk-lilac:rgba(197,138,249,.18);--stk-sky:rgba(138,180,248,.18);
+  --border-color:rgba(255,255,255,.14);--border-subtle:rgba(255,255,255,.08);
+  --shadow-1:0 1px 3px rgba(0,0,0,.4);--shadow-2:0 8px 24px rgba(0,0,0,.52);--shadow-hover:0 12px 30px rgba(0,0,0,.58);
+  --gemini-hero:radial-gradient(ellipse 80% 55% at 50% -10%,rgba(138,180,248,.14) 0%,rgba(197,138,249,.08) 45%,transparent 78%);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.7;-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background-color .22s ease,color .22s ease}
+a{color:inherit}button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer}
+h1,h2,h3,h4{font-family:var(--font-head);font-weight:700;margin:0}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.mark{font-family:var(--font-head);font-weight:800;letter-spacing:-.02em;text-decoration:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
+.mark i{font-style:normal;color:var(--accent)}
+.sticker{display:inline-block;border:1px solid var(--border-color);border-radius:999px;padding:3px 12px;font-size:12px;font-weight:600;line-height:1.5;color:var(--ink);white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 20px;border:1px solid var(--border-color);border-radius:999px;background:var(--bg);color:var(--ink);font-weight:600;text-decoration:none;transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease;white-space:nowrap}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:var(--shadow-1);border-color:var(--accent)}
+.btn:active:not(:disabled){transform:translateY(0);box-shadow:none}
+.btn-violet,.btn-primary{background:var(--accent);border-color:var(--accent);color:#ffffff!important}
+html[data-theme="dark"] .btn-violet,html[data-theme="dark"] .btn-primary{color:#062e6f!important}
+.btn-violet:hover:not(:disabled),.btn-primary:hover:not(:disabled){background:var(--accent-dark);border-color:var(--accent-dark)}
+.btn-ink{background:var(--ink);border-color:var(--ink);color:var(--bg)!important}
+.btn-sm{min-height:36px;padding:0 14px;font-size:13.5px}
+svg.i{width:17px;height:17px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== Sticky Header ===== */
+.top{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-bottom:var(--line-thin)}
+html[data-theme="dark"] .top{background:rgba(19,19,20,.88)}
+.top-in{max-width:1280px;margin:0 auto;min-height:68px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.top .mark{font-size:21px}
+.crumb{font-size:13.5px;color:var(--faint);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crumb b{color:var(--ink)}
+.top-right{display:flex;align-items:center;gap:8px;min-width:0}
+.top nav{display:flex;align-items:center;gap:4px;font-size:14.5px}
+.top nav button,.top nav a:not(.btn){padding:8px 13px;border-radius:999px;border:0;background:none;text-decoration:none;white-space:nowrap;color:var(--ink);font-weight:500}
+.top nav button:hover,.top nav a:not(.btn):hover{background:var(--surface-2);color:var(--accent-ink)}
+.pg-ctrl-btn{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;padding:0;border-radius:999px;border:1px solid var(--border-color);background:var(--surface-1);color:var(--ink);transition:background-color .16s ease,border-color .16s ease}
+.pg-ctrl-btn:hover{background:var(--surface-2);border-color:var(--accent)}
+
+/* ===== Home View ===== */
+.hero{position:relative;padding-top:52px;padding-bottom:44px;text-align:center}
+.hero::before{content:"";position:fixed;inset:0 0 auto 0;height:520px;background:var(--gemini-hero);pointer-events:none;z-index:-1}
+.hero h1{font-size:clamp(42px,7.5vw,84px);line-height:1.08;letter-spacing:-.04em;margin-bottom:18px;font-weight:800}
+.hero h1 span{display:block}
+.hero h1 span.grad{background:var(--gemini-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+html[data-theme="dark"] .hero h1 span.grad{background:linear-gradient(135deg,#8ab4f8 0%,#c58af9 55%,#f28b82 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{margin:0 auto 28px;max-width:36em;font-size:18px;line-height:1.8;color:var(--muted)}
+.search{position:relative;width:min(560px,100%);margin:0 auto 24px}
+.search input{width:100%;height:56px;border:1px solid var(--border-color);border-radius:999px;background:var(--surface-1);color:var(--ink);padding:0 96px 0 24px;font-size:16.5px;box-shadow:var(--shadow-1);transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease}
+.search input:focus{outline:none;background:var(--bg);border-color:var(--accent);box-shadow:0 0 0 4px rgba(26,115,232,.16),var(--shadow-2)}
+.search input::-webkit-search-cancel-button{display:none}
+.kbd{position:absolute;right:22px;top:50%;translate:0 -50%;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--faint);pointer-events:none}
+.kbd kbd{font:inherit;font-weight:700;color:var(--muted);background:var(--bg);border:var(--line-thin);border-radius:6px;padding:0 7px;line-height:20px}
+.search:focus-within .kbd{display:none}
+.clear{position:absolute;right:10px;top:50%;translate:0 -50%;width:38px;height:38px;border:0;border-radius:50%;background:none;font-size:21px;line-height:1;color:var(--muted)}
+.clear:hover{background:var(--track);color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;max-width:820px;margin:0 auto}
+.chip{border:1px solid var(--border-color);border-radius:999px;padding:7px 17px;font-size:14px;font-weight:600;background:var(--stk-lilac);color:var(--ink);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.chip:hover{transform:translateY(-2px);box-shadow:var(--shadow-1);border-color:var(--accent)}
+
+/* Origin box */
+.origin-note{margin-bottom:28px}
+.origin-box{border:1px solid var(--border-color);border-radius:var(--r-card);background:linear-gradient(180deg,var(--surface-1) 0%,var(--mint) 100%);padding:26px 28px;box-shadow:var(--shadow-1)}
+html[data-theme="dark"] .origin-box{background:linear-gradient(180deg,var(--surface-1) 0%,rgba(129,201,149,.09) 100%)}
+.origin-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px}
+.origin-title{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.origin-note h2{font-size:24px;line-height:1.35;letter-spacing:-.02em}
+.origin-body{display:grid;gap:10px;font-size:15px;color:var(--text)}
+.origin-body p{margin:0}
+.origin-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+
+/* Ticker */
+.ticker-clip{overflow:hidden;padding:8px 0;margin:0 0 38px}
+.ticker{border-block:var(--line-thin);background:var(--surface-2);overflow:hidden}
+.ticker-track{display:flex;width:max-content;padding:11px 0}
+.ticker-track span{display:inline-flex;align-items:center;gap:18px;padding:0 18px;font-family:var(--font-head);font-weight:700;font-size:15px;white-space:nowrap}
+.ticker-track svg{width:15px;height:15px;flex:none;color:var(--accent)}
+@keyframes scroll{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:no-preference){
+  .ticker-track{animation:scroll 42s linear infinite}
+  .ticker:hover .ticker-track{animation-play-state:paused}
+}
+
+/* Start row */
+.start{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);gap:20px;padding-bottom:44px}
+.panel{position:relative;border:1px solid var(--border-color);border-radius:var(--r-card);padding:26px;background:var(--bg);box-shadow:var(--shadow-1)}
+.panel-lilac{background:linear-gradient(180deg,var(--lilac) 0%,var(--surface-1) 100%)}
+html[data-theme="dark"] .panel-lilac{background:linear-gradient(180deg,rgba(197,138,249,.12) 0%,var(--surface-1) 100%)}
+.panel .stk-top{position:absolute;top:-13px;right:24px}
+.resume{display:flex;flex-direction:column;justify-content:space-between;gap:18px}
+.resume small{display:block;font-size:13.5px;color:var(--faint);margin-bottom:4px}
+.resume strong{display:block;font-size:22px;letter-spacing:-.02em;margin-bottom:14px;line-height:1.35}
+.meter{display:flex;align-items:center;gap:12px;font-size:13.5px;font-weight:700}
+.meter-track{flex:1;height:11px;border-radius:999px;background:var(--track);border:var(--line-thin);overflow:hidden}
+.meter-fill{display:block;height:100%;width:0;background:var(--accent);transition:width .8s var(--ease-out)}
+.resume-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.resume-actions span{font-size:12px;color:var(--faint)}
+.routes p.title{margin:0 0 16px;font-weight:800;font-size:19px;letter-spacing:-.02em}
+.route{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.route+.route{margin-top:14px}
+.route>em{font-style:normal;font-size:12.5px;color:var(--muted);width:100%;margin-bottom:-2px}
+.route-step button{display:inline-flex;align-items:center;gap:7px;background:var(--bg);border:var(--line-thin);border-radius:999px;padding:5px 13px 5px 6px;font-size:14px;font-weight:600;transition:border-color .15s ease,transform .15s ease}
+.route-step button:hover{border-color:var(--accent);transform:translateY(-1px)}
+.route-step b{width:23px;height:23px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:12px}
+html[data-theme="dark"] .route-step b{color:#062e6f}
+.route-g b{background:var(--green)}
+.dash{height:2px;width:16px;background:repeating-linear-gradient(90deg,var(--muted) 0 4px,transparent 4px 8px)}
+
+/* Sticky Filter Bar */
+.bar{position:sticky;top:68px;z-index:20;background:rgba(255,255,255,.94);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-block:var(--line-thin);margin-bottom:8px}
+html[data-theme="dark"] .bar{background:rgba(19,19,20,.92)}
+.bar .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding-top:11px;padding-bottom:11px}
+.mini{position:relative;flex:0 1 280px;min-width:190px}
+.mini input{width:100%;height:40px;border:var(--line);border-radius:999px;padding:0 16px 0 38px;font-size:14.5px;background:var(--surface-1)}
+.mini input::-webkit-search-cancel-button{display:none}
+.mini svg{position:absolute;left:13px;top:50%;translate:0 -50%;width:16px;height:16px;color:var(--muted)}
+.count{font-size:14px;color:var(--muted);white-space:nowrap}
+.count button{border:0;background:none;padding:0 0 0 8px;color:var(--accent-ink);font-weight:700;text-decoration:underline}
+.filters{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.filter{height:38px;padding:0 14px;border:var(--line);border-radius:999px;background:var(--bg);font-size:13.5px;font-weight:600;transition:background .15s ease,border-color .15s ease}
+.filter:hover{border-color:var(--accent)}
+.filter[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.filter .n{margin-left:5px;font-weight:400;opacity:.75}
+
+/* Bento Cards */
+.section{padding:36px 0 12px;scroll-margin-top:145px}
+.section-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:22px}
+.section-head h2{font-size:30px;letter-spacing:-.03em}
+.section-head p{margin:0;font-size:14.5px;color:var(--faint)}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-flow:dense;gap:18px}
+.card{position:relative;display:flex;flex-direction:column;text-align:left;min-height:215px;overflow:hidden;color:var(--ink);background:var(--paper);border:1px solid var(--border-color);border-radius:var(--r-card);padding:24px 22px 20px;box-shadow:var(--shadow-1);transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--accent)}
+.t-lilac{background:var(--lilac)}.t-mint{background:var(--mint)}.t-butter{background:var(--butter)}.t-sky{background:var(--sky)}.t-peach{background:var(--peach)}
+.card-stk{position:absolute;top:16px;right:18px}
+.card-type{margin:0 0 8px;font-size:12.5px;color:var(--faint);font-weight:600}
+.card h3{font-size:19.5px;line-height:1.4;letter-spacing:-.02em;margin:0 0 9px;padding-right:74px}
+.card .desc{margin:0 0 14px;font-size:14.5px;line-height:1.75;color:var(--muted)}
+.card .prereq{margin:auto 0 0;font-size:12.5px;line-height:1.65;color:var(--faint)}
+.card .prereq b{font-weight:700;color:var(--text)}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;min-height:24px}
+.card-foot span.stepno{font-size:12px;color:var(--faint);font-weight:600}
+.seen{display:none;background:var(--stk-mint);font-size:12px;padding:1px 10px}
+.card.visited .seen{display:inline-block}
+.wide{grid-column:span 2}
+mark{background:var(--stk-yellow);color:inherit;border-radius:4px;padding:0 2px}
+mark.ph{background:#fef08a;color:#854d0e;padding:1px 5px;border-radius:5px;font-weight:700}
+html[data-theme="dark"] mark.ph{background:rgba(253,214,99,.28);color:#fde68a}
+
+.empty{margin:24px 0 40px;padding:40px 24px;text-align:center;border:1.5px dashed var(--muted);border-radius:var(--r-big);background:var(--soft)}
+.empty h2{font-size:26px;margin:0 0 6px}
+.empty p{margin:0 0 18px;color:var(--muted)}
+
+/* FAQ & Help */
+.faq{background:var(--soft);border-block:var(--line-thin);margin-top:52px}
+.faq .wrap{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:42px;padding-top:60px;padding-bottom:60px}
+.faq-q{display:inline-grid;place-items:center;width:52px;height:52px;border:1px solid var(--border-color);border-radius:16px;background:var(--stk-lilac);font-weight:800;font-size:28px;margin-bottom:16px}
+.faq h2{font-size:34px;line-height:1.25;letter-spacing:-.03em;margin-bottom:10px}
+.faq-intro{margin:0;font-size:15.5px;color:var(--muted)}
+.faq details{border-bottom:var(--line-thin)}
+.faq summary{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:18px 4px;font-size:16px;font-weight:700;cursor:pointer;list-style:none}
+.faq summary::-webkit-details-marker{display:none}
+.plus{flex:none;width:30px;height:30px;border:1px solid var(--border-color);border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:19px;line-height:1;transition:rotate .22s ease,background .22s ease}
+.faq details[open] .plus{rotate:45deg;background:var(--stk-yellow)}
+.faq details p{margin:0 4px 18px;font-size:14.5px;line-height:1.8;color:var(--muted)}
+
+.help{padding-top:56px;padding-bottom:64px}
+.help-box{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:32px;align-items:center;background:var(--accent);color:#fff;border-radius:var(--r-big);padding:42px 46px;box-shadow:var(--shadow-2)}
+html[data-theme="dark"] .help-box{background:var(--surface-2);border:1px solid var(--border-color);color:var(--ink)}
+.help-box h2{font-size:34px;line-height:1.25;letter-spacing:-.03em;margin-bottom:12px}
+.help-box p{margin:0 0 24px;font-size:16px;line-height:1.8;opacity:.92}
+.help-actions{display:flex;flex-wrap:wrap;gap:10px}
+.help-wx-card{background:#fff;color:#1f1f1f;border-radius:20px;padding:20px;text-align:center;box-shadow:var(--shadow-1)}
+html[data-theme="dark"] .help-wx-card{background:var(--surface-1);color:var(--ink);border:1px solid var(--border-color)}
+.help-wx-card strong{display:block;font-size:20px;margin:6px 0}
+.help-wx-card span{font-size:12.5px;color:var(--muted);display:block;margin-bottom:12px}
+
+footer.foot .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding-bottom:96px;font-size:13px;line-height:1.8;color:var(--faint)}
+
+/* ===== Three-Column Interactive Guide View ===== */
+.mobile-toc{display:none;background:var(--soft);border-bottom:var(--line-thin)}
+.mobile-toc summary{display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:13.5px;font-weight:700;cursor:pointer;list-style:none}
+.mobile-toc summary::-webkit-details-marker{display:none}
+.mobile-toc .track{flex:1}
+.layout{display:grid;grid-template-columns:280px minmax(0,1fr) 270px;min-height:calc(100dvh - 68px)}
+.side{border-right:var(--line-thin);background:var(--soft);padding:24px 16px 40px}
+.side-inner{position:sticky;top:90px}
+.main{padding:36px 46px 76px;min-width:0}
+.main-in{max-width:780px;margin:0 auto}
+.rail{padding:36px 24px 40px 4px}
+.rail-inner{position:sticky;top:90px;display:grid;gap:16px}
+
+.prog{background:var(--bg);border:1px solid var(--border-color);border-radius:var(--r-mid);padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow-1)}
+.prog-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:8px}
+.prog-row span{color:var(--faint)}
+.track{height:10px;border-radius:999px;background:var(--track);border:var(--line-thin);overflow:hidden}
+.fill{height:100%;width:0;background:var(--accent);transition:width .45s var(--ease-out)}
+.toc-phase{margin:16px 8px 6px;font-size:12px;font-weight:700;color:var(--faint)}
+.toc ol{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.toc-step{display:flex;align-items:center;gap:9px;width:100%;min-height:38px;padding:4px 9px;border:1px solid transparent;border-radius:11px;background:none;text-align:left;font-size:13.5px;color:var(--muted);transition:background .15s ease,border-color .15s ease}
+.toc-step:hover{background:var(--surface-2);color:var(--ink)}
+.toc-step .dot{flex:none;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border-color);display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;background:transparent}
+.toc-step.done .dot{background:var(--green);border-color:var(--green)}
+.toc-step.current{background:var(--bg);border-color:var(--accent);color:var(--ink);font-weight:700;box-shadow:var(--shadow-1)}
+.toc-step.current .dot{background:var(--accent);border-color:var(--accent)}
+.toc-step .here{margin-left:auto}
+.toc-step .here .sticker{background:var(--stk-yellow);font-size:11px;padding:0 7px}
+
+/* Step Content Blocks */
+.step-meta{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.step-meta .sticker{background:var(--stk-lilac);font-size:12.5px}
+.step-meta span:last-child{font-size:13.5px;color:var(--faint)}
+.step h1{font-size:clamp(26px,3.2vw,38px);line-height:1.25;letter-spacing:-.03em;margin-bottom:14px;outline:none}
+.intro{margin:0 0 24px;font-size:16.5px;line-height:1.85;color:var(--muted)}
+.block{margin:0 0 24px}
+.block-title{font-weight:800;font-size:18px;margin:0 0 12px}
+.facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.fact{border:1px solid var(--border-color);border-radius:var(--r-mid);background:var(--bg);padding:14px 16px}
+.fact:nth-child(4n+1){background:var(--lilac)}.fact:nth-child(4n+2){background:var(--mint)}.fact:nth-child(4n+3){background:var(--butter)}.fact:nth-child(4n+4){background:var(--sky)}
+.fact strong{display:block;font-size:14.5px;margin-bottom:4px}
+.fact span{font-size:13.5px;line-height:1.7;color:var(--text)}
+
+.list{display:grid;gap:10px}
+.tick{display:flex;gap:12px;align-items:flex-start;padding:13px 16px;border:1px solid var(--border-color);border-radius:var(--r-mid);background:var(--bg);font-size:15px;line-height:1.7;cursor:pointer;transition:background .2s ease,border-color .2s ease}
+.tick:hover{border-color:var(--accent)}
+.tick input{width:19px;height:19px;margin:3px 0 0;flex:none;accent-color:var(--green)}
+.tick.is-checked{background:var(--mint);border-color:var(--green)}
+.tick.is-checked .tick-text{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--green);text-decoration-thickness:2px}
+.info-item{padding:12px 16px;border:1px solid var(--border-subtle);border-radius:var(--r-mid);background:var(--surface-1);font-size:14.5px;line-height:1.75;color:var(--text)}
+
+.note{position:relative;margin:14px 0 24px;padding:20px 20px 16px;border:1px solid var(--border-color);border-radius:var(--r-mid);background:var(--butter);font-size:14.5px;line-height:1.8;white-space:pre-line}
+.note .tag{position:absolute;top:-12px;left:16px}
+.note.tip{background:var(--mint)}.note.tip .tag .sticker{background:var(--stk-mint)}
+.note.warn{background:var(--peach);border-color:var(--danger)}.note.warn .tag .sticker{background:var(--stk-peach);color:#991b1b;border-color:var(--danger)}
+html[data-theme="dark"] .note.warn .tag .sticker{color:#fecaca}
+
+.table-card{border:1px solid var(--border-color);border-radius:var(--r-mid);overflow:hidden;background:var(--bg);box-shadow:var(--shadow-1)}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:11px 13px;border-bottom:var(--line-thin);vertical-align:top}
+th{background:var(--surface-2);font-weight:700;white-space:nowrap}
+
+.links{display:grid;gap:10px}
+.link{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border:1px solid var(--border-color);border-radius:var(--r-mid);background:var(--bg);text-decoration:none;transition:border-color .15s ease,transform .15s ease}
+.link:hover{border-color:var(--accent);transform:translateY(-1px);box-shadow:var(--shadow-1)}
+.link b{display:block;font-size:15px}
+.link small{display:block;font-size:12.5px;color:var(--faint)}
+
+.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.choice{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;padding:18px;border:1px solid var(--border-color);border-radius:var(--r-card);background:var(--bg);transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+.choice:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-color:var(--accent)}
+.choice[aria-pressed=true]{background:var(--accent-soft);border:2px solid var(--accent)}
+.choice[aria-pressed=true]::after{content:"已选方案";position:absolute;top:-11px;right:14px;background:var(--stk-yellow);border:1px solid var(--border-color);border-radius:999px;padding:1px 9px;font-size:11.5px;font-weight:700;color:#1f1f1f}
+.choice strong{font-size:16.5px}
+.choice span.copy{font-size:13px;line-height:1.65;color:var(--muted)}
+
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.tier-card{border:1px solid var(--border-color);border-radius:var(--r-mid);padding:15px;background:var(--surface-1)}
+.tier-card strong{display:block;font-size:15px;margin-bottom:5px}
+.tier-card p{margin:0;font-size:13.5px;line-height:1.7;color:var(--text)}
+
+.prompt{border:1px solid var(--border-color);border-radius:var(--r-card);background:var(--lilac);padding:18px;margin-bottom:14px;box-shadow:var(--shadow-1)}
+.prompt.danger-prompt{background:var(--peach);border-color:var(--danger)}
+.prompt-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.prompt-head strong{font-size:15.5px}
+.prompt-tip{margin:6px 0 0;font-size:12.5px;color:var(--muted)}
+.prompt pre{margin:10px 0 0;padding:14px;max-height:340px;overflow:auto;border:var(--line-thin);border-radius:14px;background:var(--bg);font-family:inherit;font-size:13.5px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:var(--ink)}
+
+/* Personalize Form Grid */
+.profile-panel{border:1px solid var(--border-color);border-radius:var(--r-card);background:var(--surface-1);padding:20px;box-shadow:var(--shadow-1)}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field{display:grid;gap:5px;font-size:13px;font-weight:700}
+.field input{height:44px;border:1px solid var(--border-color);border-radius:12px;padding:0 13px;background:var(--bg);color:var(--ink);font-weight:400;font-size:14.5px}
+.field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(26,115,232,.14)}
+.field small{font-weight:400;color:var(--faint)}
+
+/* Done hero & See also */
+.done-hero{position:relative;border:1px solid var(--border-color);border-radius:var(--r-big);background:var(--mint);padding:28px 26px;margin-bottom:24px}
+.done-hero .burst{position:absolute;top:16px;right:20px}
+.done-hero .burst .sticker{background:var(--stk-yellow);font-size:14px;padding:4px 14px}
+.done-hero h2{font-size:26px;margin-bottom:8px}
+.done-hero p{margin:0;color:var(--text)}
+.see{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.see-item{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:5px;padding:15px 16px;border:1px solid var(--border-color);border-radius:var(--r-mid);background:var(--sky);text-decoration:none;transition:transform .15s ease}
+.see-item:nth-child(2){background:var(--lilac)}.see-item:nth-child(3){background:var(--butter)}
+.see-item:hover{transform:translateY(-2px);box-shadow:var(--shadow-1)}
+.see-item strong{font-size:15px}
+.see-item small{font-size:12.5px;color:var(--muted);line-height:1.6}
+
+/* Bottom Nav */
+.nav{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:12px;margin-top:32px}
+.nav-prev,.nav-next{display:block;text-align:left;border:1px solid var(--border-color);border-radius:18px;padding:13px 18px;background:var(--bg);transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+.nav-prev:hover:not(:disabled),.nav-next:hover:not(:disabled){transform:translateY(-2px);box-shadow:var(--shadow-1)}
+.nav small{display:block;font-size:12.5px;color:var(--faint)}
+.nav b{font-size:15px}
+.nav-next{text-align:right;background:var(--accent);border-color:var(--accent);color:#fff}
+html[data-theme="dark"] .nav-next{color:#062e6f}
+.nav-next small{color:rgba(255,255,255,.85)}
+html[data-theme="dark"] .nav-next small{color:rgba(6,46,111,.85)}
+.nav-prev:disabled{visibility:hidden}
+.keys{margin:12px 0 0;font-size:12px;color:var(--faint);text-align:right}
+.keys kbd{font:inherit;font-weight:700;border:var(--line-thin);border-radius:5px;padding:0 6px;margin:0 2px}
+
+/* Rail Boxes */
+.box{position:relative;border:1px solid var(--border-color);border-radius:20px;background:var(--bg);padding:18px;box-shadow:var(--shadow-1)}
+.box h2{font-size:14.5px;margin:0 0 6px}
+.box p{margin:0;font-size:13px;line-height:1.75;color:var(--muted)}
+.box .tag{position:absolute;top:-12px;right:14px}
+.box-coach{background:var(--butter)}.box-coach .tag .sticker{background:var(--stk-peach)}
+.box-profile{background:var(--sky)}.box-profile .tag .sticker{background:var(--stk-sky)}
+.box-help{background:var(--lilac)}.box-help .tag .sticker{background:var(--stk-mint)}
+.box .btn{width:100%;margin-top:10px}
+.save{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.save i{width:9px;height:9px;border-radius:50%;background:var(--green)}
+
+/* Profile Dialog + Support Panel + Toast */
+.dialog{position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);margin:0;width:min(540px,calc(100vw - 28px));max-height:calc(100dvh - 40px);overflow:auto;padding:24px;border:1px solid var(--border-color);border-radius:24px;background:var(--bg);color:var(--ink);box-shadow:var(--shadow-2)}
+.dialog::backdrop{background:rgba(15,23,42,.45)}
+.dialog .x,.support-panel .x{position:absolute;top:12px;right:12px;width:32px;height:32px;border:0;border-radius:50%;background:var(--surface-2);color:var(--ink);font-size:19px;line-height:1}
+.float-btn{position:fixed;right:20px;bottom:20px;z-index:45;display:inline-flex;align-items:center;gap:8px;min-height:46px;padding:0 18px;border:1px solid var(--border-color);border-radius:999px;background:var(--accent);color:#fff;font-weight:600;font-size:14px;box-shadow:var(--shadow-2)}
+html[data-theme="dark"] .float-btn{color:#062e6f}
+.support-panel{position:fixed;right:20px;bottom:76px;z-index:45;width:min(340px,calc(100vw - 28px));padding:20px;border:1px solid var(--border-color);border-radius:22px;background:var(--bg);box-shadow:var(--shadow-2)}
+.support-panel h3{font-size:17px;margin:0 28px 6px 0}
+.support-panel p{margin:0 0 12px;font-size:13.5px;color:var(--muted)}
+.support-panel .btn{width:100%;margin-top:8px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);z-index:99;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow-2);opacity:0;pointer-events:none;transition:opacity .2s ease,transform .2s ease;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.warn{background:#b45309;color:#fff}
+
+/* Responsive */
+@media (max-width:1100px){
+  .layout{grid-template-columns:250px minmax(0,1fr)}
+  .rail{grid-column:1 / -1;padding:0 24px 36px}
+  .rail-inner{position:static;grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:920px){
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .wide{grid-column:auto}
+  .start,.faq .wrap,.help-box,.choices,.tiers{grid-template-columns:1fr}
+  .layout{grid-template-columns:1fr}
+  .side{display:none}
+  .mobile-toc{display:block;position:sticky;top:68px;z-index:30}
+  .main{padding:26px 18px 60px}
+}
+@media (max-width:640px){
+  .wrap{padding:0 16px}
+  .top-in{padding:0 14px;min-height:60px}
+  .top .mark{font-size:18px}
+  .top nav a:not(.btn),.top nav button.nav-hide-sm,.crumb{display:none}
+  .bar,.mobile-toc{top:60px}
+  .hero{padding-top:32px;padding-bottom:30px}
+  .lead{font-size:15.5px}
+  .search input{height:50px;padding-right:52px}
+  .kbd{display:none}
+  .cards,.facts,.grid-2,.nav,.rail-inner{grid-template-columns:1fr}
+  .filters{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;width:100%}
+  .filters::-webkit-scrollbar{display:none}
+  .filter{flex:none}
+  .help-box{padding:28px 20px}
+  .float-btn span{display:none}
+  .float-btn{right:14px;bottom:14px;padding:0 14px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <a href="#home" class="mark" id="brandHomeLink">myaiplus<i>.</i>guide</a>
+    <span class="crumb" id="topCrumb" hidden>全部教程 / <span id="crumbPhase"></span> / <b id="crumbTitle"></b></span>
+    <div class="top-right">
+      <nav aria-label="主导航">
+        <button type="button" id="navHomeBtn" class="nav-hide-sm">全部教程</button>
+        <button type="button" id="navGuideBtn" class="nav-hide-sm">互动向导</button>
+        <button type="button" id="navProfileBtn">分站换名器</button>
+        <button type="button" id="navFaqBtn" class="nav-hide-sm">常见问题</button>
+        <a class="btn btn-violet btn-sm" href="https://myaiplus.store/user/group/index" target="_blank" rel="noopener noreferrer">¥9.9 开通分站</a>
+      </nav>
+      <button type="button" class="pg-ctrl-btn" id="themeToggleBtn" aria-label="切换浅色/深色主题" title="切换浅色/深色主题">
+        <svg class="i" id="themeIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== VIEW A: HOME OVERVIEW ==================== -->
+<main id="homeView">
+  <section class="hero wrap" aria-labelledby="heroTitle">
+    <h1 id="heroTitle"><span>别慌，</span><span class="grad">跟着做就行。</span></h1>
+    <p class="lead">MyAIPlus 严选 · 新代理开站、定价防坑、发圈引流与客服话术……13 个互动步骤，每一步都能打勾和一键复制。填好「分站换名器」后全站文案自动换成你的店铺与微信。</p>
+    <div class="search" role="search">
+      <label class="sr" for="search">搜索教程或话术</label>
+      <input id="search" type="search" placeholder="想找哪一步或哪套话术？" autocomplete="off" />
+      <span class="kbd" aria-hidden="true">按 <kbd>/</kbd> 搜索</span>
+      <button type="button" class="clear" id="clearHero" aria-label="清空搜索" hidden>&times;</button>
+    </div>
+    <div class="chips" aria-label="常用直达">
+      <button type="button" class="chip" data-q="独立分站">独立分站</button>
+      <button type="button" class="chip" data-q="ns" style="background:var(--stk-yellow)">NS 绑定免备案</button>
+      <button type="button" class="chip" data-q="Tab 1" style="background:var(--stk-mint)">双页签定价</button>
+      <button type="button" class="chip" data-q="朋友圈" style="background:var(--stk-sky)">朋友圈 3 套文案</button>
+      <button type="button" class="chip" data-q="闲鱼" style="background:var(--stk-peach)">闲鱼暗语防封</button>
+      <button type="button" class="chip" data-q="VPN" style="background:var(--stk-yellow)">VPN 合规红线</button>
+    </div>
+  </section>
+
+  <section class="origin-note wrap" aria-labelledby="originTitle">
+    <div class="origin-box">
+      <div class="origin-head">
+        <div class="origin-title">
+          <span class="sticker" style="background:var(--stk-mint)">零服务器 · 零代码 · 24 小时自动发货</span>
+          <h2 id="originTitle">为什么 99% 新代理直接开通独立分站？</h2>
+        </div>
+        <button type="button" class="btn btn-sm" id="originEditProfileBtn">设置我的店名与微信</button>
+      </div>
+      <div class="origin-body">
+        <p><strong>复用总店托管系统，免服务器、免接支付、内置白标客服不抢客：</strong>通过总店开通 <strong>¥9.9 至尊代理（赠送顶级分销权限）</strong> 后，你只需花十几元买一个 4～8 位短域名并用 NS 一键绑定，即可拥有自己的独立网站与自动发货商城；上游货源调价时系统自动联动跟调、守住利润不倒挂。</p>
+        <p><strong>防误发保护已开启：</strong>本教程内全部面向终端客户的推广文案均已脱敏并使用 <code>{{你的店铺名}}</code> / <code>{{你的独立域名}}</code> / <code>{{你的微信}}</code> 占位；点上方「分站换名器」填入你自己的信息，即可全站自动替换为专属可转发文案。</p>
+      </div>
+      <div class="origin-actions">
+        <a class="btn btn-violet btn-sm" href="https://myaiplus.store/user/group/index" target="_blank" rel="noopener noreferrer">去开通 ¥9.9 顶级分销</a>
+        <button type="button" class="btn btn-sm" id="originCopyWxBtn">复制店主核验微信：xjmazh</button>
+        <button type="button" class="btn btn-sm" id="originStartGuideBtn">进入 13 步交互向导</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker-clip" aria-hidden="true">
+    <div class="ticker"><div class="ticker-track" id="ticker"></div></div>
+  </div>
+
+  <section class="start wrap" aria-label="从哪开始">
+    <div class="panel resume">
+      <div>
+        <small id="resumeLabel">还没开始？</small>
+        <strong id="resumeTitle">先看「三种赚钱模式对比」</strong>
+        <div class="meter">
+          <span class="meter-track"><span class="meter-fill" id="meterFill"></span></span>
+          <span id="meterText">已完成 0 / 13 步</span>
+        </div>
+      </div>
+      <div class="resume-actions">
+        <button type="button" class="btn btn-violet" id="resumeStartBtn">开始互动向导</button>
+        <span>进度与换名配置只存在本机浏览器</span>
+      </div>
+    </div>
+    <div class="panel panel-lilac routes">
+      <span class="stk-top"><span class="sticker" style="background:var(--stk-yellow)">第一次来看这里</span></span>
+      <p class="title">按这两条路走，基本不会绕弯</p>
+      <div id="routesHost"></div>
+    </div>
+  </section>
+
+  <section class="bar" id="bar" aria-label="筛选教程模块">
+    <div class="wrap">
+      <div class="mini">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg>
+        <label class="sr" for="search2">在列表里搜索</label>
+        <input id="search2" type="search" placeholder="搜索步骤、定价或文案" autocomplete="off" />
+      </div>
+      <span class="count" id="count" role="status" aria-live="polite">共 13 个交互步骤，挑一个开始</span>
+      <div class="filters" role="group" aria-label="按主题筛选">
+        <button class="filter" type="button" data-filter="all" aria-pressed="true">全部<span class="n" data-n="all">13</span></button>
+        <button class="filter" type="button" data-filter="setup" aria-pressed="false">开站准备<span class="n" data-n="setup"></span></button>
+        <button class="filter" type="button" data-filter="pricing" aria-pressed="false">定价与风控<span class="n" data-n="pricing"></span></button>
+        <button class="filter" type="button" data-filter="copy" aria-pressed="false">引流文案库<span class="n" data-n="copy"></span></button>
+        <button class="filter" type="button" data-filter="support" aria-pressed="false">售后与红线<span class="n" data-n="support"></span></button>
+      </div>
+    </div>
+  </section>
+
+  <div id="tutorials" class="wrap">
+    <div id="sectionsHost"></div>
+    <section class="empty" id="empty" hidden>
+      <h2>没有找到对应内容</h2>
+      <p>换个关键词试试，或直接查看全部 13 个向导步骤：</p>
+      <button class="btn btn-ink" type="button" id="clearAllBtn">查看全部教程</button>
+    </section>
+  </div>
+
+  <section class="faq" id="faq" aria-labelledby="faqTitle">
+    <div class="wrap">
+      <div>
+        <span class="faq-q" aria-hidden="true">?</span>
+        <h2 id="faqTitle">开始前，<br />你可能想问</h2>
+        <p class="faq-intro">把新人最容易卡住和踩坑的问题先理清，开站不走弯路。</p>
+      </div>
+      <div id="faqHost"></div>
+    </div>
+  </section>
+
+  <section class="help wrap" id="help">
+    <div class="help-box">
+      <div>
+        <h2>做到一半卡住了？<br />直接微信找店主。</h2>
+        <p>开通 ¥9.9 至尊代理后，发你的平台账号名给店主核验进代理群。改 NS、调双页签定价或遇大额采购问题，都可以随时发截图沟通。</p>
+        <div class="help-actions">
+          <a class="btn" href="https://myaiplus.store/user/group/index" target="_blank" rel="noopener noreferrer" style="background:#fff;color:#0b57d0;border-color:#fff;">打开 ¥9.9 开通入口</a>
+          <button type="button" class="btn" id="helpEnterGuideBtn" style="background:rgba(255,255,255,.16);color:#fff;border-color:rgba(255,255,255,.45);">开始 13 步交互向导</button>
+        </div>
+      </div>
+      <div class="help-wx-card">
+        <div style="font-size:12px;color:var(--faint);">店主 / 代理核验微信</div>
+        <strong>xjmazh</strong>
+        <span>添加备注：代理咨询</span>
+        <button type="button" class="btn btn-violet btn-sm" id="helpCopyWxBtn" style="width:100%;">一键复制微信号</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ==================== VIEW B: 3-COL INTERACTIVE WIZARD ==================== -->
+<div id="guideView" hidden>
+  <details class="mobile-toc" id="mobileToc">
+    <summary><span id="mProgText">第 1 / 13 步</span><span class="track" aria-hidden="true"><span class="fill" id="mFill"></span></span><span>切换步骤</span></summary>
+    <nav class="toc" id="mToc" style="padding:8px 16px 14px;" aria-label="移动端步骤目录"></nav>
+  </details>
+  <div class="layout">
+    <aside class="side" aria-label="步骤目录">
+      <div class="side-inner">
+        <div class="prog">
+          <div class="prog-row"><span>向导进度</span><b id="progText">第 1 / 13 步</b></div>
+          <div class="track" role="progressbar" id="progBar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="fill" id="fill"></div></div>
+        </div>
+        <nav class="toc" id="toc" aria-label="桌面端步骤目录"></nav>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="main-in">
+        <article class="step" id="stepHost"></article>
+        <div class="nav">
+          <button type="button" class="nav-prev" id="prevBtn"><small>上一步</small><b id="prevTitle"></b></button>
+          <button type="button" class="nav-next" id="nextBtn"><small id="nextSub">下一步</small><b id="nextTitle"></b></button>
+        </div>
+        <p class="keys">提示：可用键盘 <kbd>&larr;</kbd> / <kbd>&rarr;</kbd> 切换上一步或下一步</p>
+      </div>
+    </main>
+
+    <aside class="rail" aria-label="实时小提示与换名器">
+      <div class="rail-inner">
+        <section class="box box-coach" id="coachBox">
+          <span class="tag"><span class="sticker">小提示</span></span>
+          <h2>这一步的小提示</h2>
+          <p id="coachText"></p>
+        </section>
+        <section class="box box-profile">
+          <span class="tag"><span class="sticker">分站换名</span></span>
+          <h2>我的分站一键换名器</h2>
+          <p id="railProfileSummary"></p>
+          <button type="button" class="btn btn-sm" id="railOpenProfileBtn">修改店名 / 域名 / 微信</button>
+        </section>
+        <section class="box box-help">
+          <span class="tag"><span class="sticker">别硬扛</span></span>
+          <h2>卡住了？联系店主</h2>
+          <p>微信 <strong>xjmazh</strong>（备注代理咨询），进群领上新动态。</p>
+          <button type="button" class="btn btn-ink btn-sm" id="railCopyWxBtn">复制微信：xjmazh</button>
+          <a class="btn btn-sm" href="https://myaiplus.store/user/group/index" target="_blank" rel="noopener noreferrer">打开 ¥9.9 开通入口</a>
+        </section>
+        <section class="box">
+          <h2>本机记录</h2>
+          <p class="save"><i aria-hidden="true"></i>勾选与配置仅存于当前浏览器</p>
+          <button type="button" class="btn btn-sm" id="railHomeBtn">返回教程总览页</button>
+          <button type="button" class="btn btn-sm" id="railResetBtn">重置向导进度</button>
+        </section>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <span class="mark">myaiplus<i>.</i>guide</span>
+    <p>MyAIPlus 严选 代理入营与交付指南（离线可交互版）｜ 严禁涉及任何 VPN / 网络代理工具，严格合规经营。</p>
+  </div>
+</footer>
+
+<!-- 换名器弹窗 -->
+<dialog class="dialog" id="profileDialog" aria-labelledby="profileDialogTitle">
+  <button type="button" class="x" id="profileDialogClose" aria-label="关闭">&times;</button>
+  <h2 id="profileDialogTitle" style="margin:0 0 6px;font-size:21px;">我的分站一键换名器</h2>
+  <p style="margin:0 0 14px;font-size:13.5px;color:var(--muted);">填入你自己的分站信息，全站全部发圈、群公告和客服话术会自动替换为你的信息，防止误发成总店微信号！</p>
+  <div class="grid-2">
+    <label class="field"><span>我的店铺名</span><input id="dlg-store-name" type="text" placeholder="例：星辰AI严选" autocomplete="off" /></label>
+    <label class="field"><span>我的独立域名</span><input id="dlg-store-domain" type="text" placeholder="例：https://starai.store" autocomplete="off" /></label>
+    <label class="field"><span>我的售后微信</span><input id="dlg-store-wechat" type="text" placeholder="填入你自己的微信号" autocomplete="off" /></label>
+    <label class="field"><span>我的下级代理门槛价</span><input id="dlg-subagent-fee" type="text" placeholder="默认 ¥9.9" autocomplete="off" /></label>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;">
+    <button type="button" class="btn btn-violet btn-sm" id="dlgSaveCloseBtn">保存并应用</button>
+    <button type="button" class="btn btn-sm" id="dlgFillSampleBtn">恢复示例</button>
+    <button type="button" class="btn btn-sm" id="dlgResetBlankBtn">恢复占位符</button>
+  </div>
+</dialog>
+
+<!-- 右下角悬浮联系弹窗 -->
+<button class="float-btn" id="supportBtn" type="button" aria-expanded="false" aria-controls="supportPanel">
+  <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <span>开站咨询 / 换名器</span>
+</button>
+<div class="support-panel" id="supportPanel" hidden>
+  <button class="x" id="supportCloseBtn" type="button" aria-label="关闭">&times;</button>
+  <h3>需要帮助或进代理群？</h3>
+  <p>先在总店完成 ¥9.9 至尊代理开通，再加微信 xjmazh 备注「代理咨询」。</p>
+  <button type="button" class="btn btn-violet btn-sm" id="panelCopyWxBtn">复制店主微信：xjmazh</button>
+  <a class="btn btn-sm" href="https://myaiplus.store/user/group/index" target="_blank" rel="noopener noreferrer">打开 ¥9.9 开通入口</a>
+  <button type="button" class="btn btn-sm" id="panelOpenProfileBtn">打开分站换名器</button>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script id="kit-data" type="application/json">{"brand": "MyAIPlus 严选", "storeUrl": "https://myaiplus.store", "agentUpgradeUrl": "https://myaiplus.store/user/group/index", "ownerWechat": "xjmazh", "defaultAgentFee": "¥9.9", "phases": [{"title": "了解模式与入门", "copy": "看清定位 · 选对合作模式"}, {"title": "10 分钟极速开站", "copy": "开通权限 · 买域名 · NS 与装修"}, {"title": "科学定价与防坑", "copy": "四梯队定价 · 双页签 · 提现风控"}, {"title": "当天出单与合规", "copy": "一键换名 · 全渠道文案 · 红线"}], "routes": [{"id": "launch", "tone": "blue", "label": "想 10 分钟开好独立站", "steps": [{"stepId": "step1-upgrade", "title": "¥9.9 开通分销"}, {"stepId": "step2-domain", "title": "买 4～8 位短域名"}, {"stepId": "step3-ns", "title": "NS 绑定免备案"}, {"stepId": "step4-setup", "title": "装修与隐藏测试"}]}, {"id": "sell", "tone": "green", "label": "开好后马上发圈出单", "steps": [{"stepId": "personalize", "title": "填好分站换名器"}, {"stepId": "copy-wechat", "title": "发朋友圈 / 社群"}, {"stepId": "support-redline", "title": "客服话术与红线"}]}], "faqs": [{"q": "下级代理花钱开通了至尊代理，为什么主页顶部「今日净佣金」和「余额」没变？钱到哪了？", "a": "这笔钱已经实时到账了！记住三个口径区分：① 分站会员升级收入和卖货佣金全部进入「硬币」账户（用于硬币兑现），不会进入「余额」；② 主页顶部的「今日净佣金 / 累计净佣金」和「下级订单」只统计商品销售订单，不含会员升级收入；③ 核对开通到账请看主页下方「今日收入 / 总收入(硬币)」或左侧菜单「我的账单 → 分站会员等级收入」。以定价 ¥9.9 为例，平台无额外固定开站底费，按顶级分销商 5% 手续费扣 ¥0.49 后，实到硬币 ¥9.41（占 95%）。"}, {"q": "为什么不自己买服务器写代码，也不用直接跳过总店？", "a": "走 MyAIPlus 严选（https://myaiplus.store）的独立分站系统，免买服务器、免自己接支付接口、上游供货价变化时系统自动联动跟调、内置白标在线客服不抢客，你只要专注绑定短域名和引流成交即可；通过总店开通 ¥9.9 至尊代理即可进代理群拿一手动态。"}, {"q": "一定要自己买独立短域名吗？能用默认前缀吗？", "a": "强烈建议花十几元买一个 4～8 位短域名（如 .store / .shop / .xin / .com）。AI 用户大多懂网址结构，若用二级长前缀子域名，客户把前缀一删就会直接搜主站。注册时记得关闭自动续费，不勾网盘或 SSL 附加项。"}, {"q": "我在后台改了零售价，为什么老用户登录下单价格还是没变？", "a": "这是新人最高频踩坑！在后台「管理商品 → 规格定价」调价时，务必同时填写「Tab 1 网站零售价」和「Tab 2 会员等级加价（普通 / 高级 / 至尊）」。只改 Tab 1 游客看到新价，已登录会员仍按旧比例拿货。"}, {"q": "上游供应链涨价了会不会导致我亏本卖货？", "a": "开启「分站调价通知」策略后，当上游供货价变动时，系统会自动保留你设置的固定加价金额或比例并同步联动调整前台售价，不用熬夜盯盘也不会亏本。"}, {"q": "我的店名、域名、微信号和勾选题进度会上传到服务器吗？", "a": "不会！所有分站换名信息、模式选择与每一步的勾选进度全部只保存在你当前浏览器的本地存储（localStorage）中，刷新不丢失、也不会向任何外部服务器上传你的业务数据。"}, {"q": "客户问「你们卖 VPN 梯子吗 / 怎么翻墙」怎么回复？", "a": "这是绝对违法红线，绝对不能提供、推荐或教学任何 VPN / 代理软件！统一使用标准合规话术回复：「本店仅提供正版 AI 工具与会员订阅服务，不提供也不推荐任何网络代理工具，请自行解决网络环境。」"}], "steps": [{"id": "overview", "phase": 0, "filterCat": "setup", "short": "三种赚钱模式", "type": "合作定位", "title": "先看全局：三种变现模式对比与新人路线", "desc": "加入 MyAIPlus 严选 后有 3 种赚钱模式，99% 的新代理建议直接选择「模式 3：开通独立分站」，把客户与 30 天复购留存在自己的域名下。", "prep": "准备好手机或电脑浏览器，规划 10 分钟按向导完成开站", "tint": "t-sky", "sticker": "新人必看", "badgeBg": "var(--stk-mint)", "wide": true, "keywords": "合作定位 赚钱模式 推广链接 人工拿货 独立分站 白标 自动发货", "intro": "欢迎加入 MyAIPlus 严选！这份交互式向导融合了《新人必读说明》《极速开站与合规手册》与《当天出单引流文案大礼包》。开始动手前，先花 1 分钟看清三种变现模式的区别。", "facts": [{"title": "10 分钟零代码拥有独立站", "body": "免买服务器、免自己接支付、24 小时自动发货，内置白标在线客服帮你兜底基础答疑且不抢客。"}, {"title": "13 步手把手交互向导", "body": "每一步可打勾核对，顶部或第 9 步可填入你自己的店名、域名和微信，全站文案自动一键替换防误发。"}], "table": {"title": "三种合作模式对比", "headers": ["合作模式", "玩法说明", "核心优点", "局限 / 建议"], "rows": [["1. 推广链接分成", "在个人中心复制推广链接发给客户", "零配置、不用管售后", "无法自己改价，客户归属感弱"], ["2. 人工接单拿货", "谈妥后用代理价下单提取卡密手动发客户", "灵活报价；支持 USDT 0 手续费降本", "离开手机无法自动成交"], ["3. 开通独立分站（强烈推荐）", "开通顶级分销权限并绑定自己的独立域名", "自由加价、独立装修公告、客户沉淀在自己网站、24h 自动发卡", "提现付常规通道费；严禁上架违规自营品"]]}, "note": {"kind": "tip", "tag": "建议路径", "text": "想长期做复购与滚雪球流水，直接选模式 3「开通独立分站」，接下来按顺序走完全部 13 步即可。"}, "coach": "先把模式看清，99% 的高复购代理都走「模式 3：独立分站」。点右下角继续挑你的起步模式。", "button": "看懂了，去选合作模式"}, {"id": "choose-mode", "phase": 0, "filterCat": "setup", "short": "选起步方式", "type": "路径分支", "kind": "choice", "title": "你打算怎么起步？（点选最符合你的节奏）", "desc": "选中你的当前目标，页面会帮你记录偏好并给出最顺手的操作建议。", "prep": "明确是开独立分站长线收租，还是先发圈接单试水", "tint": "t-lilac", "sticker": "交互选择", "badgeBg": "var(--stk-lilac)", "keywords": "独立分站 至尊代理 人工拿货 推广链接 选择模式", "intro": "点击下方卡片选择你今天的执行目标（选择记录保存在本地浏览器，随时可切换）：", "choices": [{"value": "substore", "title": "开通独立分站（99% 推荐）", "copy": "¥9.9 开通顶级分销 → 买短域名 NS 一键绑定 → 自由加价、24 小时自动发货", "feedback": "最佳选择！第 3～6 步将带你在 10 分钟内开出自己的独立域名商城，并自动配好公告与提现方式。"}, {"value": "manual", "title": "先手动接单试水（朋友圈/闲鱼）", "copy": "先不买域名，先套用文案发圈谈成客户，再回总店代理价下单提卡密交付", "feedback": "适合当天快速出首单验证！建议你同样先在 https://myaiplus.store/user/group/index 花 ¥9.9 锁定顶级代理折扣，然后重点看第 9～12 步引流文案。"}, {"value": "promo", "title": "极简推广链接分享", "copy": "直接拿个人中心推广链接发社群/朋友，零配置自动计佣金", "feedback": "最省事做法！注册登录后即可取链接推广；建议后续单量起来后随时升级绑独立域名，防止客户流失。"}], "coach": "哪怕先想发朋友圈试试水，也建议先把独立分站名额占住，有独立域名客户信任度会翻倍。", "button": "确定方案，开始第 1 步"}, {"id": "step1-upgrade", "phase": 1, "filterCat": "setup", "short": "第 1 步：开通权限", "type": "开站第 1 步", "title": "第 1 步：注册登录总店并 ¥9.9 开通「至尊代理」", "desc": "打开 https://myaiplus.store 注册登录 → 访问 https://myaiplus.store/user/group/index 开通至尊代理赠送顶级分销权限 → 加微信 xjmazh 核验进群。", "prep": "准备常用邮箱/账号名，准备微信备注「代理咨询」", "tint": "t-mint", "sticker": "约 2 分钟", "badgeBg": "var(--stk-mint)", "keywords": "开通代理 至尊代理 顶级分销 ¥9.9 xjmazh 注册 登录", "intro": "先到官方总店开通顶级分销资格，系统才会解锁你左侧菜单里的「我的店铺 → 域名绑定」与「分站设置」能力。", "links": [{"label": "1. 打开官方总店注册登录（https://myaiplus.store）", "sub": "用常用信息注册一个易记的平台账号", "url": "https://myaiplus.store"}, {"label": "2. 直达代理开通页（限时 ¥9.9）", "sub": "https://myaiplus.store/user/group/index · 选择「至尊代理」赠送顶级分销权限", "url": "https://myaiplus.store/user/group/index"}], "bullets": ["第 1 步：打开 https://myaiplus.store 注册一个未在其他站点绑定过分销的新账号并登录。", "第 2 步：进入 https://myaiplus.store/user/group/index，选择「至尊代理（限时特价 ¥9.9）」完成支付，系统自动赠送顶级分销权限（⚠️ 已绑定其他站点分销关系的会员不赠送）。", "第 3 步：添加店主微信 xjmazh（添加备注「代理咨询」或「AI合作」），发送你的平台账号名核验进代理群。"], "checks": ["已在 https://myaiplus.store 用未绑定其他站点分销关系的账号注册登录", "已在 https://myaiplus.store/user/group/index 开通「至尊代理」拿到顶级分销权限", "已添加店主微信 xjmazh 并备注「代理咨询」等待拉群"], "note": {"kind": "tip", "tag": "微信核验 & 防不赠送提醒", "text": "加店主微信 xjmazh 时记得附带你的平台账号名。另注意系统规则：「已绑定其他站点分销关系的会员不赠送」顶级分销权限，新代理务必用干净新号开通！"}, "coach": "这一步完成后你就拥有了全套独立站后台权限！微信 xjmazh 可在右侧栏一键复制。", "button": "权限已开通，去买短域名"}, {"id": "step2-domain", "phase": 1, "filterCat": "setup", "short": "第 2 步：买短域名", "type": "开站第 2 步", "title": "第 2 步：购买 4～8 位独立短域名（切忌用二级子域）", "desc": "花十几元在阿里云万网或腾讯云助手买 4～8 位好记短域名（.store/.shop/.xin/.com），务必关闭自动续费、不要勾附加项。", "prep": "阿里云账号或微信小程序「腾讯云助手」（首年约 ¥1～¥14）", "tint": "t-butter", "sticker": "避坑必看", "badgeBg": "var(--stk-yellow)", "keywords": "短域名 阿里云 万网 腾讯云 子域名 自动续费 .store .shop .xin", "intro": "千万不要图省事使用二级长前缀子域名！因为买 AI 工具的人大多懂电脑，看到前缀子域名很容易把前缀删掉直接去搜总站。独立短域名只需十几块钱，就能建立专属品牌护城河。", "facts": [{"title": "域名后缀优先级", "body": "优先挑 4～8 位字母/拼音短词，后缀首推 .store / .shop / .xin / .com，既好念又适合微信评论区报网址。"}, {"title": "官方买域名避坑", "body": "阿里云万网（首年约 ¥14）或腾讯云助手小程序（首年优惠 ¥1～¥14）；结账前取消「自动续费」，不勾网盘/SSL/AI 建站。"}], "checks": ["已选定并注册 4～8 位好记的独立短域名（不使用免费二级子域名）", "已确认结账时关闭了自动续费，且未误购额外 SSL/建站套餐"], "note": {"kind": "warn", "tag": "不用单买 SSL", "text": "域名注册页弹出的「SSL 证书」「云主机」「AI 建站」一律不要买！下一步 NS 绑定会自动免费帮你签发全站 HTTPS 证书。"}, "coach": "域名的好坏只看两点：短、好念。比如星辰小店买 xingchen.store 就比一串乱码更容易让人记住。", "button": "域名买好了，下一步绑定 NS"}, {"id": "step3-ns", "phase": 1, "filterCat": "setup", "short": "第 3 步：NS 绑定", "type": "开站第 3 步", "title": "第 3 步：NS 一键绑定域名（自动 HTTPS + 免国内备案）", "desc": "后台选「NS 接入（Cloudflare 加速）」填根域名拿到 2 条 *.ns.cloudflare.com，到域名商控制台替换默认 DNS 即完成全自动接入。", "prep": "刚买好的根域名（如 yourdomain.store）与域名商控制台权限", "tint": "t-sky", "sticker": "免备案", "badgeBg": "var(--stk-sky)", "keywords": "*.ns.cloudflare.com NS接入 域名绑定 HTTPS 备案 阿里云 腾讯云 DNS修改", "intro": "这是开站最核心的一步！按下面顺序点 4 次鼠标，系统会自动把根域名 + www 接入、源站解析、访问加速与 HTTPS 安全锁全部搞定，免去繁琐的国内服务器备案流程。", "bullets": ["1. 登录分站后台 → 左侧菜单「我的店铺」→「域名绑定」→「添加独立域名」。", "2. 接入方式选择「NS 接入（Cloudflare 加速）」，填写你的根域名（如 starai.store，⚠️ 不要加 https:// 或 www.）后提交。", "3. 复制系统分配给你的 2 条专属 *.ns.cloudflare.com 地址。", "4. 打开域名商控制台（阿里云点「管理 → DNS 修改」；腾讯云点「修改 DNS」），删掉原有默认 DNS，替换为后台分配的 2 条 NS 地址并保存。", "5. 等待几十分钟到几小时（最长 24～48 小时）全球生效，浏览器打开你的域名带锁图标即为成功！"], "checks": ["填写根域名时没有多加 https:// 或 www.", "已把阿里云/腾讯云默认 DNS 全部替换为系统分配的 2 条 *.ns.cloudflare.com"], "note": {"kind": "warn", "tag": "填写格式红线", "text": "在分站后台添加域名时只写根域名（例如 starai.store），千万不要带着 https:// 或斜杠提交；DNS 修改处也只需要填那两条 *.ns.cloudflare.com。"}, "coach": "改完 NS 后全球生效需要几十分钟到几小时，等待期间正好继续第 4 步把店铺装修、测试商品隐藏和提现账号配完！", "button": "NS 已提交，去装修店铺"}, {"id": "step4-setup", "phase": 1, "filterCat": "setup", "short": "第 4 步：装修与提现", "type": "开站第 4 步", "title": "第 4 步：店铺装修、隐藏测试类目与绑定支付宝提现", "desc": "设置店名/正方形头像/SEO/公告，保持 3 个全局展示开关打开；进入「管理商品」隐藏测试分类；绑好支付宝收款码满 ¥10 即可提现。", "prep": "准备一张正方形品牌头像图、你的收款支付宝账号与收款二维码", "tint": "t-mint", "sticker": "扫尾开业", "badgeBg": "var(--stk-mint)", "keywords": "店铺设置 店铺公告 正方形头像 隐藏测试类目 显示主站商品 支付宝 提现 10元", "intro": "域名绑定生效的同时，把门面装修和钱包收款通道一次配好，确保第一批客人进店就能看到干净专业的商城、正常提现到账。", "bullets": ["我的店铺 → 店铺设置：填清晰的店铺名称、网站标题与 SEO 关键词，上传专属正方形品牌头像替换默认图。", "开启三大全局开关：确保「显示主站商品[全局]」「显示会员等级价格」「显示在线客服」全部处于开启状态。", "⚠️ 隐藏测试类目/测试商品：进入「管理商品」，把测试分类与测试商品全部设为「隐藏」，避免客人误拍或显得不专业。", "安全中心 → 个人资料：填妥真实姓名（提现校验用）、支付宝账号、支付宝收款码，佣金满 ¥10 即可随时发起提现。"], "copyBlocks": [{"title": "分站后台「店铺公告」直接粘贴模板", "tip": "会自动读取你在换名器填的店名、微信和门槛价；先粘贴保存，之后改完换名器再覆盖一次即可。", "body": "📢 欢迎光临【{{你的店铺名}}】· 24 小时全自动发卡商城\n\n✅ 全店 24 小时自助下单：付款后请点击页面顶部「我的订单」自助提取账号卡密与使用指南；\n✅ 质保说明清晰透明：成品号 / 官方直充请务必先看清商品详情页标注（「质保全程」或「质保首登」），不玩文字游戏；\n✅ 售后 / 大额企业采购 / 定制选型：请添加店主微信 {{你的微信}}（备注：订单咨询）；\n💎 代理合作招募中：支持开通独立分站、自由加价与 24 小时自动发货，详情请加微信 {{你的微信}} 咨询！\n\n⚠️ 合规声明：本店仅提供正版 AI 工具订阅与数字邮箱服务，严格合规经营，不提供也不推荐任何 VPN / 网络代理工具，请自行解决网络环境。"}], "checks": ["已上传正方形品牌头像并粘贴保存好「店铺公告」", "已进入「管理商品」隐藏了上游测试分类和测试商品", "已在「安全中心 → 个人资料」填妥支付宝姓名、账号与收款码"], "coach": "最容易漏的是「隐藏测试商品」！上线后用手机无痕浏览器打开自己的域名亲自走一遍下单页面最稳妥。", "button": "开站全搞定，进入科学定价"}, {"id": "pricing-tiers", "phase": 2, "filterCat": "pricing", "short": "四梯队定价", "type": "定价策略", "title": "科学定价：千万别全店一刀切百分比，按四梯队定价", "desc": "全店商品跨度从十几元到数千元：统一加 10% 低价引流号几乎无利，统一加 30% 旗舰大单会比老牌号商还贵。按四梯队精准出价。", "prep": "打开后台「管理商品」，对照下面 4 个梯队检查重点商品售价", "tint": "t-butter", "sticker": "定价核心", "badgeBg": "var(--stk-yellow)", "wide": true, "keywords": "四梯队 定价 谷歌邮箱 Gemini Pro GPT Plus Claude Pro Cursor 固定加价", "intro": "一个健康赚钱的 AI 订阅站不是靠全店无脑加价，而是「引流钩子拉新 + 中客单爆款吃复购 + 大单低比例薄利稳拿企业客户」。对照下表设置零售价即可兼顾销量与利润：", "table": {"title": "四梯队零售定价参考表", "headers": ["商品梯队", "定位与策略", "推荐加价思路", "高性价比参考零售价"], "rows": [["梯队 1：引流基础号 / 谷歌邮箱", "低门槛敲门砖，专攻小红书/闲鱼拉新", "固定加价 ¥6～¥10", "全新谷歌邮箱 ¥15.8～¥17.8 · 高权重老谷歌 ¥20.8～¥24.8 · GPT/Grok 普号 ¥10.8～¥13.8"], ["梯队 2：中客单爆款 AI 订阅", "全店出单主力与 30 天续费核心", "稳健固定加价，显著低于高价二道贩子", "Gemini Pro 成品 ¥58 · GPT Plus 成品 ¥72～¥85 · GPT Plus 直充 ¥148～¥172 · Claude Pro 直充 ¥169 · Grok/Cursor 三合一 ¥82 / ¥168"], ["梯队 3：中高客单进阶款", "程序员、重度高频开发者与科研人群", "比例加价控制在 15%～25%", "Gemini Ultra 5x/20x · ChatGPT 100 美刀 ¥724～¥752"], ["梯队 4：旗舰高客单大单", "企业/团队必做全网比价，用好价稳拿", "比例加价控制在 9%～15%", "Claude MAX 5x/20x ¥848 / ¥1698 · ChatGPT 200 美刀 ¥1248～¥1462 · 年费 / 500 美刀 ¥1468 / ¥3438"]]}, "note": {"kind": "tip", "tag": "定价心法", "text": "低客单引流品尽量用「固定加价」而不是百分比；几百上千元的 Claude MAX、200/500 美刀大单压低加价比例，全网比价你就能直接截胡。"}, "coach": "重点先调好梯队 1（谷歌邮箱/基础号）和梯队 2（Gemini Pro、GPT Plus、Claude Pro），这几款占日常 80% 订单！", "button": "记住了，看后台 4 大防坑细节"}, {"id": "pricing-pitfalls", "phase": 2, "filterCat": "pricing", "short": "后台 4 防坑与资金", "type": "后台防坑", "title": "后台调价 4 大防坑细节（Tab 1 + Tab 2）与资金风控", "desc": "改价务必双页签同步设好 Tab 1 网站零售价 + Tab 2 会员等级加价；善用噱头价、自动跟调、裂变二级代理与 USDT 降本。", "prep": "准备进入分站后台「管理商品 → 规格定价」与「分站会员等级」", "tint": "t-peach", "sticker": "必防 4 坑", "badgeBg": "var(--stk-peach)", "keywords": "Tab 1 Tab 2 网站零售价 会员等级加价 噱头价 分站调价通知 购买后赠送顶级分销权限 USDT 提现费率", "intro": "后台这 4 个开关和细节直接决定你的利润是否漏水、上游涨价是否亏本、以及能不能靠下级代理赚被动管道收入：", "facts": [{"title": "1. 双页签同步设置（极重要！）", "body": "在「管理商品 → 规格定价」改价时，必须同时填好「Tab 1 网站零售价」和「Tab 2 会员等级加价（普通 / 高级 / 至尊）」！否则已登录老会员会按默认比例走。"}, {"title": "2. 善用「噱头价 / 划线原价」", "body": "商品「设置」里填写略高于实际售价的划线原价（例如实际卖 ¥85，原价参考写 ¥139），多规格卡片对比感强，转化率明显提升。"}, {"title": "3. 「分站调价通知」自动防亏本", "body": "上游价格变动时，系统会自动保留你设置的固定加价或比例并同步调整前台售价，无需半夜手动盯盘，彻底告别倒挂亏本。"}, {"title": "4. 裂变二级代理赚双重管道收益", "body": "① 开通费分润：以定价 ¥9.9 为例，平台无额外固定开站底费，按顶级分销商 5% 手续费扣 ¥0.49 后，实到硬币 ¥9.41（占 95%）（需在「分站会员等级」勾选：购买后赠送顶级分销权限；已绑定其他站点分销关系的会员不赠送）；② 出单分成：下级后续每出一笔单，你在 Tab 2 给「至尊代理」设置的会员等级加价会自动结算进你的硬币账户（勿设 0）。"}], "bullets": ["采购降本：采购或代充尽量使用 BEP-USDT / USDT-TRC20（0 手续费），省去通道手续费损耗。", "提现费率参考（硬币兑现满 ¥10 起提）：微信提现 1.5%、支付宝提现 2%、钱包余额转消费 1%、USDT(BSC) 2.5%。", "大额私域风控：几百上千元企业大单尽量引导走商城担保订单或规范收款方式，切勿直接私人微信/支付宝大额收款防恶意举报。"], "note": {"kind": "tip", "tag": "⚠️ 防误会核账指南（查代理开通费去这里看）", "text": "代理开通费与卖货佣金都进入「硬币」账户，不会进入「余额」，也不显示在主页顶部的「今日净佣金」与「下级订单」列表！\n核对下级开通到账：看主页下方「今日收入 / 总收入(硬币)」，或点左侧菜单「我的账单」查看来源为「分站会员等级收入」的流水。"}, "checks": ["已理解调价必须同步检查 Tab 1（零售价）与 Tab 2（普通/高级/至尊等级加价，且至尊加价不能为 0）", "已检查「分站会员等级」中至尊代理勾选了「购买后赠送顶级分销权限」", "已明确代理升级费扣 5% 后 95% 进「硬币」账户，查账走「我的账单 → 分站会员等级收入」"], "coach": "检查 Tab 1 和 Tab 2 双页签是最容易救回漏掉利润的动作！做好后，下一步去配你的「分站一键换名器」。", "button": "后台无坑了，去配置换名器"}, {"id": "personalize", "phase": 3, "filterCat": "copy", "short": "一键换名器", "type": "行前配置", "kind": "personalize", "title": "先填好你的分站信息：全站所有文案秒级自动替换", "desc": "填入你的店铺名、独立域名、售后微信号与下级代理门槛价，后面全部朋友圈、小红书、群公告与客服话术会自动替换并防止误发总店微信。", "prep": "你起好的店铺名、独立域名（带 https://）和你自己的微信号", "tint": "t-sky", "sticker": "一键换名", "badgeBg": "var(--stk-sky)", "keywords": "一键换名器 店铺名 独立域名 微信号 占位符 防误发", "intro": "在发给你的客户之前，请先把下方 4 项换成你自己的分站信息（保存在本地浏览器，不填时文案会用黄色标签高亮标出 {{...}} 占位符提醒你修改）：", "coach": "填好这 4 项后，后面第 10、11、12 步所有「一键复制」出来的文案就 100% 是你自己的店铺名、域名和微信了！", "button": "信息配好了，去拿发圈文案"}, {"id": "copy-wechat", "phase": 3, "filterCat": "copy", "short": "微信与群文案", "type": "引流渠道 1", "title": "微信私域运营、第 27 天唤醒与朋友圈/群首发文案", "desc": "成交按「日期/渠道/商品/售价」备注，第 27 天提醒续费滚雪球；聚焦程序员/科研/工作室与 KOL 团长，直接复制 3 套朋友圈 + 群置顶公告。", "prep": "建议先配好第 9 步分站换名器，配完下方每张卡直接点「复制」就能发圈", "tint": "t-mint", "sticker": "利润核心", "badgeBg": "var(--stk-mint)", "wide": true, "keywords": "微信私域 第27天 备注格式 朋友圈 群置顶公告 程序员 科研 KOL 代理招募", "intro": "核心原则：拒绝纯低价内卷！一切公域动作都是为了把人加进微信私域、引导到你的独立域名成交，并用 30 天续费周期滚雪球。", "bullets": ["客户打标签铁律：每成交一单立即修改微信备注为「日期 / 渠道 / 商品 / 售价」（例：11-23 / 小红书 / GPT成品 / 85）。", "第 27 天自动唤醒：到期前 3 天提醒备份重要对话记录并询问续费（老客可用后台「客户专属价」给点优惠，复购率极高）。", "聚焦高净值客群与 KOL 借力：程序员/科研硕博重稳定轻差价；企业负责人易成单 ¥168+ 月卡与 ¥1,468+ 年费；可直接给 B 站/抖音中小效率博主开高级或至尊代理，躺赚供应链差价。"], "copyBlocks": [{"title": "朋友圈文案 1：新店上线官宣（配店铺首页截图）", "tip": "⚠️ 发圈后立即自己在第 1 条评论放链接：自助下单直达：{{你的独立域名}}", "body": "自己搭了一个 24 小时自助 AI 工具小店【{{你的店铺名}}】正式上线啦 🚀\n平时写代码、写方案、搞科研要用 GPT Plus、Claude Pro、Gemini Pro、Cursor 的朋友不用再到处找高价二道贩子了！\n\n一手源头供应链，全店透明标价、拍完即取：\n✅ Gemini Pro 成品号 ¥58\n✅ GPT Plus 成品号 ¥72~¥85 / 官方直充 ¥148 起\n✅ Claude Pro 官方直充 ¥169\n✅ 高权重谷歌老号 / 全新邮箱 ¥15.8 起\n\n系统 24 小时自动发货，付完款点「我的订单」直接提取！网址放评论区，不知道怎么选直接戳微信 {{你的微信}} 帮你搭 👇"}, {"title": "朋友圈文案 2：痛点对比种草（第 2～3 天发）", "tip": "适合搭配工单截图或模型对比效果图，主打「同样稳但省一半」。", "body": "好多朋友问写代码、改英文论文到底选哪款最划算？\n其实现在 Claude Pro / Cursor 和 Gemini Pro 真没必要花两三百找中介开：\n• 我小店 Gemini Pro 成品号才 ¥58，预算更紧还能选体验款；\n• GPT Plus 全程质保成品 ¥85，自己留聊天记录选官方直充也才 ¥148 起；\n• 比乱七八糟的高价代充省下一半多，关键是 24 小时自动发卡、明码标质保周期。\n\n需要自取：{{你的独立域名}} ，选不准版本直接私信 {{你的微信}} 给你推荐最稳的 👍"}, {"title": "朋友圈文案 3：招募下级代理躺赚文案", "tip": "发完出单反馈后搭配此文案，把老客与副业关注者变成你的下级分站。", "body": "顺手招几个一起做 AI 工具订阅小店的伙伴 🤝\n只要 {{你的代理门槛价}} 门槛开通顶级分销权限，直接送一套跟我一模一样的独立网店系统：\n✅ 不用买服务器、不用写代码、不用自己囤货压资金\n✅ 可绑定你自己的独立域名，后台自由加价，卖多少差价随时提现\n✅ 24 小时全自动发卡 + 在线客服帮你承接基础答疑\n\n保姆级开站教程和全套发圈文案我都打包好了，想试个零负担副业的直接加 {{你的微信}} 备注「代理」领资料！"}, {"title": "微信群 / TG 群置顶自助商城公告", "tip": "建群或运营社群时直接置顶，引导自助访问 {{你的独立域名}} 下单。", "body": "📢 【{{你的店铺名}} · 群内 24 小时自助商城】\n\n欢迎新老朋友！需要主流 AI 工具订阅或海外邮箱可直接进入自助小店选购，明码标价、全自动发货：\n🔥 热门直降参考：\n• Gemini Pro 美区成品号：¥58\n• GPT Plus 月卡成品（首登 / 全程质保）：¥72 / ¥85\n• GPT PLUS 官方直充月卡（质保 30 天）：¥148 起\n• Claude Pro 官方直充月卡：¥169\n• 全新谷歌邮箱 / 高权重谷歌老号：¥15.8 / ¥20.8 起\n\n🛒 自助下单直达：{{你的独立域名}}\n💬 选型咨询 / 开通独立分站代理（限时 {{你的代理门槛价}}）：加店主微信 {{你的微信}}\n\n⚠️ 合规公告：本群及店铺仅提供正版 AI 工具与邮箱服务，严禁在群内讨论、求购或发送任何 VPN / 代理 / 网络加速工具，违者移出！"}], "coach": "发朋友圈时主正文别放网址，发完秒抢第 1 条评论发你的独立域名，展示效果更好也不容易被折叠！", "button": "发圈文案get，看小红书与闲鱼"}, {"id": "copy-xhs-xianyu", "phase": 3, "filterCat": "copy", "short": "小红书与闲鱼", "type": "引流渠道 2～4", "title": "小红书矩阵发货避坑 + 闲鱼暗语速查表 + TG 社群自动化", "desc": "小红书主号保持干净、无物流发货用文档指南防违规；闲鱼严格规避敏感词并用小众合规品引流私域升单。", "prep": "备好干净小红书号或闲鱼备用合规号（切勿拿主支付宝冒险）", "tint": "t-lilac", "sticker": "防限流防封", "badgeBg": "var(--stk-lilac)", "keywords": "小红书 无物流 发货避坑 闲鱼 暗语 GPT OpenAI Claude Gemini Codex Telegram", "intro": "公域流量最大的难点是「平台关键词风控」。按下面这套防限流规则和暗语速查表操作，安全把流量洗进你的微信私域：", "facts": [{"title": "小红书 4 大铁律", "body": "① 简介绝不写「代充/卖号」硬广；② 截流「会员充不上/论文润色卡住」求助帖可做 1.5x 溢价；③ 无物流店铺发货仅发卡密或飞书/腾讯文档指引（严禁外网裸链/微信二维码大图）；④ 主号干净挂卡，小号矩阵评论。"}, {"title": "TG 频道 + 群 + 机器人矩阵", "body": "搭建「上新优惠播报频道」+「AI 交流购卡群」+ 配套商店机器人，设置关键词秒回实时价目卡与入群欢迎语，私聊直达你的独立域名。"}], "table": {"title": "闲鱼安全沟通暗语速查表（标题 / 首图 / 聊天框严禁用左列原词！）", "headers": ["禁止出现词（买家先发也绝不复述）", "推荐替代安全表达"], "rows": [["GPT / OpenAI / Plus", "奥特曼月卡 · 智能写作对话会员 · 4.0 版本学习助手"], ["Claude / Codex", "C家编程写作工具 · 代码科研辅助月卡"], ["Gemini / 谷歌账号", "G家学习会员 · 海外邮箱成品 · 老号邮箱"], ["30天质保 / 5小时限流", "一个月内坏了包修 · 连续对话几小时需休息一下"], ["直接发网站链接", "上架审核较松的小众设计/科研工具引流，加上微信后展示完整分站目录升大单"]]}, "copyBlocks": [{"title": "小红书笔记模板 A：工具对比干货帖（大号/专业号）", "tip": "⚠️ 图文与评论区勿放外部裸链，私信回复或发白底黑字极简微信号小图 {{你的微信}}。", "body": "标题：用了半年这几个 AI 助手，这笔省钱账终于算明白了｜3 分钟避坑清单\n\n1. 痛点共鸣：很多人一上手就盲目开最贵套餐，平时写文档、润色论文根本用不完额度，还容易买到共享卡顿号踩坑。\n2. 客观对比：图省事免注册选独享「成品号」（即买即用）；常用老号想保留全部历史对话选「官方直充且写明 30 天全程质保」的方案。\n3. 经验分享：我整理了一份按场景选型对比和避坑清单，需要的同学评论区扣「清单」或私我发你。"}, {"title": "小红书笔记模板 B：新手避坑提问帖（小号评论区联动）", "tip": "主号挂商品卡保持干净，小号在评论区客观分享体验吸引主动私信。", "body": "标题：第一次用主流 AI 会员，到底选成品还是直充？\n\n正纠结买成品号怕不会注册太麻烦，又怕自己充流程踩坑。有懂行的同学说说哪种长期用最稳、性价比最高吗？\n\n（小号神评论配合：我刚开始也踩过共享坑，后来换了带 30 天质保的直充渠道算下来省一半多，一直用到现在挺稳。）"}, {"title": "小红书笔记模板 C：学生 / 科研党高效率场景帖", "tip": "瞄准论文润色、外刊精读人群，转化率与客单价最高。", "body": "标题：赶论文润色外刊文献全靠它，一周省出两倍睡眠时间\n\n拆解长 PDF 文献、改英文表达、梳理数学公式真的全靠工具提速，完全不用再硬熬通宵……\n卡在工具准备或账号订阅环节的同学可以滴滴，我整理了分步图文说明帮你少走弯路！"}, {"title": "小红书无物流店铺标准发货消息（防封必按此发）", "tip": "开通专业号无物流商品卡后，用下面这段配合飞书/腾讯文档指引链接。", "body": "感谢拍下！你的订单已为你安排发出，兑换信息 / 使用指引如下：\n【兑换内容】：请查看本条卡片附带的卡密或飞书/腾讯文档图文自提指南（按步骤 1 分钟完成激活）。\n【温馨提示】：请核对所选商品页标注的质保方式；如需售后指引切勿在平台内发外链，请参考图文文档或联系售后微信（可附白底黑字微信号小图 {{你的微信}}）。"}, {"title": "闲鱼安全引流升单话术（切勿发英文AI词或网址）", "tip": "⚠️ 闲鱼聊天框绝对禁止出现 GPT/OpenAI/Claude/Gemini/Codex！", "body": "你好呀！这边平台文字限制太多发不了图文激活步骤和完整对比清单，你拍下或需要详细对照说明的话，这边先发份极简使用小卡片给你，按上面的指引联系（微信 {{你的微信}}）看全部版本保障和教程哈～"}], "coach": "做闲鱼千万记住：就算买家问你「有没有 GPT」，你也只能回「奥特曼月卡有货」，绝对不能把禁词再打一遍！", "button": "全渠道引流稳了，看售后与红线"}, {"id": "support-redline", "phase": 3, "filterCat": "support", "short": "客服话术与红线", "type": "售后与合规", "title": "私域客服 6 大高转化回复话术 + ⚠️ 绝对合规红线", "desc": "牢记「质保全程 / 质保首登 / 活动号无售后」三档区别与原路退款防套利；严禁涉 VPN / 梯子 / 翻墙，遇询问直接一键复制合规拒答。", "prep": "遇到客户提问时，直接回来本页点击「复制这段话术」秒回", "tint": "t-peach", "sticker": "红线必看", "badgeBg": "var(--stk-peach)", "wide": true, "keywords": "客服话术 质保全程 质保首登 活动号无售后 原路退款 发票 VPN 梯子 翻墙 合规红线", "intro": "把售后规则讲在前面，就不会扯皮；把法律合规红线守死，分站和收款账号才能长期安全稳赚：", "note": {"kind": "warn", "tag": "⚠️ 绝对合规红线（一条都不能碰）", "text": "1. 严禁提供、推荐、售卖或教学使用 VPN / 代理 / 梯子 / 翻墙软件，无论对方出多少钱！\n2. 严禁私自上架社媒违规引流号、灰黑产脚本或侵权违禁资料。\n3. 退款必须「原支付渠道原路退回」（如支付宝付款原路退回支付宝），防止跨渠道退款「双份退赔」套利。"}, "tiers": [{"title": "1. 「质保全程」", "desc": "如 GPT Plus 全程成品、官方直充：订阅周期内正常售后质保，遇异常按规则排查补发或售后。"}, {"title": "2. 「质保首登」", "desc": "如部分低价成品/批号：仅保证第一次登录成功状态正常，下单前务必提前向买家提醒规则防扯皮。"}, {"title": "3. 「活动号无售后」", "desc": "如超低价限时活动款：详情页与沟通中明确写明低价活动属性，切勿盲目口头承诺「稳用三个月」。"}], "bullets": ["企业开票应对：企业客户索要发票时，可联系在线客服按对应税点代开，或自行办理个体工商户（小规模纳税人月额度内通常 1%），提前把税点计入报价。"], "copyBlocks": [{"danger": true, "title": "⚠️ 红线必用：客户问「你们提供梯子 / VPN / 科学上网吗？」", "tip": "无论客户怎么套话，一律复制这段标准合规回复，绝不推荐任何加速/翻墙工具！", "body": "不好意思哦，本店仅提供正版 AI 工具与会员订阅服务，严格合规经营，不提供也不推荐任何网络代理工具，请自行解决网络环境。如果是 AI 账号选择或充值问题，随时发我帮你推荐！"}, {"title": "客服话术 1：客户问「怎么买？多久发货？」", "tip": "直接引导到你的独立域名自助下单、页面顶部「我的订单」自提。", "body": "很简单，直接打开我的 24 小时自助小店：{{你的独立域名}}\n选好对应商品直接下单付款，系统会自动发货！付完款点页面顶部的「我的订单」就能直接看到账号卡密和详细使用步骤。不会操作的话随时微信（{{你的微信}}）发我截图～"}, {"title": "客服话术 2：客户问「成品号和官方直充有什么区别？选哪款？」", "tip": "按用户是否已有常用号/历史记录精准推荐，成交率最高。", "body": "一句话帮你分清怎么选：\n• 成品号（比如 Gemini Pro ¥58、GPT Plus ¥72/¥85）：适合不想自己折腾注册、买来就能直接登录用的，性价比最高（选「质保全程」整个订阅期都稳妥售后）。\n• 官方直充（比如 GPT Plus 直充 ¥148 起、Claude Pro ¥169）：适合你自己已经有常用账号、想保留全部历史聊天记录的，直接续充到你原账号，质保 30 天。\n你平时主要是写代码、改论文还是日常办公？我帮你挑一款最省钱又好用的！"}, {"title": "客服话术 3：客户问「为什么网上卖两百多，你这便宜这么多？」", "tip": "打消低价疑虑，用明码质保与自助发卡立住信任。", "body": "我这边接的是一手源头直供和独立网站自助发卡，省掉了层层中间商加价和大量人工客服成本，走的是薄利多销靠老客复购。\n每款商品详情页都明明白白写了质保方式和发货规则（全程质保的写全程，首登款也会提前写清），不玩文字游戏。你可以先选一单月卡用着看稳定性，顺手再长期续费～"}, {"title": "客服话术 4：第 27 天老客续费提醒（提高 30 天复购率）", "tip": "到期前 3 天主动关怀提醒备份聊天记录，复购转化率最高的一句话。", "body": "哈喽～我看下记录，你上个月在小店（{{你的店铺名}}）拿的 AI 会员再过 3 天左右就到期啦！\n提醒你这两天顺手把里面重要的对话记录或代码方案导出备份一下，防止过期后不方便回看～需要续费直接去 {{你的独立域名}} 下单就行；老客一次续多月或者想试其他模型，提前跟我说一声，我还可以给你在后台设个老客专属优惠价 👍"}, {"title": "客服话术 5：老客用得稳，顺手转化成你的下级代理", "tip": "让满意老客花 {{你的代理门槛价}} 成为你的下级独立分站，滚起管道收益。", "body": "看你这段时间用得挺顺手的！跟你说个小福利：现在我店里限时 {{你的代理门槛价}} 就能开通「至尊代理」权限（系统还直接送你一套和我一模一样的独立网店系统，支持绑你自己的域名和自由定价）。\n你自己以后用会员不仅享低价，发给同事、同学用只要出一两单就把 {{你的代理门槛价}} 赚回来了，后面还能长期赚复购差价。想要试试的话我把开站步骤和文案大礼包发你，10 分钟就能搭好！"}], "coach": "只要记住三条：不碰 VPN、只按详情页写明的质保承诺、支付宝付款只退支付宝，长久经营零事故！", "button": "全部学会了，完成入营通关！"}, {"id": "done", "phase": 3, "filterCat": "support", "kind": "done", "short": "入营通关完成", "type": "通关清单", "title": "恭喜！你已掌握独立开站与全渠道引流出单全流程", "desc": "查看毕业清单与每天日常动作，随时可回到任意步骤一键复制文案或修改分站信息。", "prep": "确保第 1～6 步均已完成、独立短域名已绑定、换名器已保存你的微信", "tint": "t-mint", "sticker": "通关毕业", "badgeBg": "var(--stk-mint)", "keywords": "通关 完成 毕业 日常运营 清单 续费", "intro": "开站和文案准备全部就绪，现在就在朋友圈发出你的第 1 条新店上线官宣，接下第一批 30 天复购客户吧！", "doneGroups": [{"title": "你已经完成 / 掌握", "items": ["通过 ¥9.9 至尊代理开通独立分站顶级分销权限", "用 4～8 位短域名 + *.ns.cloudflare.com 免备案接入 HTTPS", "隐藏了测试商品、同步设置 Tab 1 零售价与 Tab 2 会员加价", "配齐朋友圈、小红书、闲鱼暗语与 6 大客服话术弹药库"]}, {"title": "每天记得执行", "items": ["每成交 1 单立刻按「日期 / 渠道 / 商品 / 售价」改微信备注", "第 27 天私信老客提醒备份对话并引导复购或转二级代理", "严守合规红线：绝不推荐任何 VPN / 梯子，绝不在闲鱼打英文敏感词", "佣金满 ¥10 即可提现；大额采购优选 USDT 0 手续费降本"]}], "seeAlso": [{"title": "回去复制朋友圈首发文案", "stepId": "copy-wechat", "desc": "立即复制第 1 天开业官宣 + 评论区挂你的独立域名"}, {"title": "修改我的分站换名器", "stepId": "personalize", "desc": "随时微调店名、独立域名、微信号与门槛价"}, {"title": "去总店入口升级或登录", "url": "https://myaiplus.store/user/group/index", "desc": "直达 https://myaiplus.store/user/group/index 查看订单与等级权限"}], "coach": "祝开单大吉！遇到具体后台调价或大单咨询卡住了，随时点右下角「联系店主」微信号 xjmazh！", "button": "返回教程总览页"}]}</script>
+<script>
+(function () {
+  "use strict";
+  var DATA = JSON.parse(document.getElementById("kit-data").textContent);
+  var STORE_KEY = "pg_agent_guide_state_v1";
+  var THEME_KEY = "pg-agent-theme-v1";
+
+  var state = {
+    view: "home",
+    stepIdx: 0,
+    filter: "all",
+    query: "",
+    modeChoice: "substore",
+    visited: {},
+    stepChecks: {},
+    storeName: "",
+    storeDomain: "",
+    storeWechat: "",
+    subAgentFee: DATA.defaultAgentFee || ""
+  };
+
+  function safeGet(k) {
+    try { return window.localStorage ? window.localStorage.getItem(k) : null; } catch (_e) { return null; }
+  }
+  function safeSet(k, v) {
+    try { if (window.localStorage) { window.localStorage.setItem(k, v); } } catch (_e) {}
+  }
+
+  function loadState() {
+    var raw = safeGet(STORE_KEY);
+    if (!raw) { return; }
+    try {
+      var p = JSON.parse(raw);
+      if (p && typeof p === "object") {
+        if (typeof p.stepIdx === "number" && p.stepIdx >= 0 && p.stepIdx < DATA.steps.length) {
+          state.stepIdx = p.stepIdx;
+        }
+        if (typeof p.modeChoice === "string") { state.modeChoice = p.modeChoice; }
+        if (p.visited && typeof p.visited === "object") { state.visited = p.visited; }
+        if (p.stepChecks && typeof p.stepChecks === "object") { state.stepChecks = p.stepChecks; }
+        if (typeof p.storeName === "string") { state.storeName = p.storeName; }
+        if (typeof p.storeDomain === "string") { state.storeDomain = p.storeDomain; }
+        if (typeof p.storeWechat === "string") { state.storeWechat = p.storeWechat; }
+        if (typeof p.subAgentFee === "string" && p.subAgentFee.trim()) { state.subAgentFee = p.subAgentFee; }
+      }
+    } catch (_e) {}
+  }
+
+  function saveState() {
+    safeSet(STORE_KEY, JSON.stringify({
+      stepIdx: state.stepIdx,
+      modeChoice: state.modeChoice,
+      visited: state.visited,
+      stepChecks: state.stepChecks,
+      storeName: state.storeName,
+      storeDomain: state.storeDomain,
+      storeWechat: state.storeWechat,
+      subAgentFee: state.subAgentFee
+    }));
+  }
+
+  function syncThemeIcon() {
+    var dark = document.documentElement.dataset.theme === "dark";
+    var icon = document.getElementById("themeIcon");
+    if (!icon) { return; }
+    icon.innerHTML = dark
+      ? "<circle cx='12' cy='12' r='5'/><line x1='12' y1='1' x2='12' y2='3'/><line x1='12' y1='21' x2='12' y2='23'/><line x1='4.22' y1='4.22' x2='5.64' y2='5.64'/><line x1='18.36' y1='18.36' x2='19.78' y2='19.78'/><line x1='1' y1='12' x2='3' y2='12'/><line x1='21' y1='12' x2='23' y2='12'/><line x1='4.22' y1='19.78' x2='5.64' y2='18.36'/><line x1='18.36' y1='5.64' x2='19.78' y2='4.22'/>"
+      : "<path d='M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z'/>";
+  }
+
+  var toastTimer = null;
+  function showToast(msg, isWarn) {
+    var el = document.getElementById("toast");
+    el.textContent = msg;
+    el.className = "toast show" + (isWarn ? " warn" : "");
+    if (toastTimer) { clearTimeout(toastTimer); }
+    toastTimer = setTimeout(function () { el.className = "toast"; }, 2600);
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "readonly");
+    ta.style.position = "fixed";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (_e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  function copyText(text, warnIfPlaceholder) {
+    var hasPh = warnIfPlaceholder && /\{\{你的[^}]+\}\}/.test(text);
+    function finish(ok) {
+      if (!ok) { showToast("自动复制受限，请手动选中复制", true); return; }
+      if (hasPh) {
+        showToast("已复制（提示：含 {{...}} 占位符未填写，建议打开「分站换名器」先填好）", true);
+      } else {
+        showToast("已复制到剪贴板，可直接去粘贴！", false);
+      }
+    }
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+      navigator.clipboard.writeText(text).then(function () { finish(true); }).catch(function () { finish(fallbackCopy(text)); });
+    } else {
+      finish(fallbackCopy(text));
+    }
+  }
+
+  function resolveText(tpl) {
+    var sName = state.storeName.trim() || "{{你的店铺名}}";
+    var sDomain = state.storeDomain.trim() || "{{你的独立域名}}";
+    var sWx = state.storeWechat.trim() || "{{你的微信}}";
+    var sFee = state.subAgentFee.trim() || (DATA.defaultAgentFee || "");
+    return tpl
+      .replace(/\{\{你的店铺名\}\}/g, sName)
+      .replace(/\{\{你的独立域名\}\}/g, sDomain)
+      .replace(/\{\{你的微信\}\}/g, sWx)
+      .replace(/\{\{你的代理门槛价\}\}/g, sFee);
+  }
+
+  function renderHighlightedPlaceholders(el, plainText) {
+    el.textContent = "";
+    var rx = /\{\{你的[^}]+\}\}/g;
+    var last = 0;
+    var m;
+    while ((m = rx.exec(plainText)) !== null) {
+      if (m.index > last) { el.appendChild(document.createTextNode(plainText.slice(last, m.index))); }
+      var mk = document.createElement("mark");
+      mk.className = "ph";
+      mk.textContent = m[0];
+      el.appendChild(mk);
+      last = rx.lastIndex;
+    }
+    if (last < plainText.length) { el.appendChild(document.createTextNode(plainText.slice(last))); }
+  }
+
+  function renderSearchHighlighted(el, text, words) {
+    el.textContent = "";
+    if (!words.length) { el.textContent = text; return; }
+    var esc = words.map(function (w) { return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("|");
+    var rx = new RegExp(esc, "gi");
+    var last = 0;
+    var m;
+    while ((m = rx.exec(text)) !== null) {
+      if (m.index > last) { el.appendChild(document.createTextNode(text.slice(last, m.index))); }
+      var mk = document.createElement("mark");
+      mk.textContent = m[0];
+      el.appendChild(mk);
+      last = rx.lastIndex;
+    }
+    if (last < text.length) { el.appendChild(document.createTextNode(text.slice(last))); }
+  }
+
+  function stepIndexById(id) {
+    for (var i = 0; i < DATA.steps.length; i += 1) {
+      if (DATA.steps[i].id === id) { return i; }
+    }
+    return 0;
+  }
+
+  function openGuideAt(stepIdx, skipScroll) {
+    state.view = "guide";
+    state.stepIdx = Math.max(0, Math.min(DATA.steps.length - 1, stepIdx));
+    var cur = DATA.steps[state.stepIdx];
+    state.visited[cur.id] = Date.now();
+    saveState();
+
+    document.getElementById("homeView").hidden = true;
+    document.getElementById("guideView").hidden = false;
+    document.getElementById("topCrumb").hidden = false;
+    document.getElementById("crumbPhase").textContent = DATA.phases[cur.phase].title;
+    document.getElementById("crumbTitle").textContent = cur.short;
+
+    renderGuideStep();
+    renderToc();
+    if (!skipScroll) { window.scrollTo({ top: 0, behavior: "auto" }); }
+  }
+
+  function openHome(scrollTargetId) {
+    state.view = "home";
+    document.getElementById("homeView").hidden = false;
+    document.getElementById("guideView").hidden = true;
+    document.getElementById("topCrumb").hidden = true;
+    renderHomeDynamic();
+    if (scrollTargetId) {
+      var target = document.getElementById(scrollTargetId);
+      if (target) { target.scrollIntoView({ behavior: "smooth" }); }
+    } else {
+      window.scrollTo({ top: 0, behavior: "auto" });
+    }
+  }
+
+  function renderTicker() {
+    var host = document.getElementById("ticker");
+    host.textContent = "";
+    var starSvg = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.6 6.9L22 12l-7.4 3.1L12 22l-2.6-6.9L2 12l7.4-3.1z"/></svg>';
+    var doubleList = DATA.steps.concat(DATA.steps);
+    doubleList.forEach(function (st) {
+      var sp = document.createElement("span");
+      sp.textContent = st.short;
+      sp.insertAdjacentHTML("beforeend", starSvg);
+      host.appendChild(sp);
+    });
+  }
+
+  function renderRoutes() {
+    var host = document.getElementById("routesHost");
+    host.textContent = "";
+    DATA.routes.forEach(function (rt) {
+      var div = document.createElement("div");
+      div.className = "route" + (rt.tone === "green" ? " route-g" : "");
+      var em = document.createElement("em");
+      em.textContent = rt.label;
+      div.appendChild(em);
+
+      rt.steps.forEach(function (item, idx) {
+        if (idx > 0) {
+          var dash = document.createElement("span");
+          dash.className = "dash";
+          dash.setAttribute("aria-hidden", "true");
+          div.appendChild(dash);
+        }
+        var wrap = document.createElement("span");
+        wrap.className = "route-step";
+        var btn = document.createElement("button");
+        btn.type = "button";
+        var b = document.createElement("b");
+        b.textContent = String(idx + 1);
+        var txt = document.createElement("span");
+        txt.textContent = item.title;
+        btn.appendChild(b);
+        btn.appendChild(txt);
+        btn.addEventListener("click", function () {
+          openGuideAt(stepIndexById(item.stepId));
+        });
+        wrap.appendChild(btn);
+        div.appendChild(wrap);
+      });
+      host.appendChild(div);
+    });
+  }
+
+  function renderFaqs() {
+    var host = document.getElementById("faqHost");
+    host.textContent = "";
+    DATA.faqs.forEach(function (f) {
+      var det = document.createElement("details");
+      var sum = document.createElement("summary");
+      var qSpan = document.createElement("span");
+      qSpan.textContent = f.q;
+      var plus = document.createElement("span");
+      plus.className = "plus";
+      plus.setAttribute("aria-hidden", "true");
+      plus.textContent = "+";
+      sum.appendChild(qSpan);
+      sum.appendChild(plus);
+      var p = document.createElement("p");
+      p.textContent = f.a;
+      det.appendChild(sum);
+      det.appendChild(p);
+      host.appendChild(det);
+    });
+  }
+
+  function renderHomeDynamic() {
+    var total = DATA.steps.length;
+    var visitedCount = Object.keys(state.visited).length;
+    var pct = Math.round((visitedCount / total) * 100);
+    document.getElementById("meterFill").style.width = pct + "%";
+    document.getElementById("meterText").textContent = "已完成 " + visitedCount + " / " + total + " 步";
+
+    var curStep = DATA.steps[state.stepIdx] || DATA.steps[0];
+    if (visitedCount > 0) {
+      document.getElementById("resumeLabel").textContent = "上次看到第 " + (state.stepIdx + 1) + " 步";
+      document.getElementById("resumeTitle").textContent = curStep.short + "：" + curStep.title;
+      document.getElementById("resumeStartBtn").textContent = "继续上次向导";
+    } else {
+      document.getElementById("resumeLabel").textContent = "还没开始？";
+      document.getElementById("resumeTitle").textContent = "先看「" + curStep.title + "」";
+      document.getElementById("resumeStartBtn").textContent = "从第 1 步开始";
+    }
+
+    var countsByCat = { setup: 0, pricing: 0, copy: 0, support: 0 };
+    DATA.steps.forEach(function (s) {
+      if (countsByCat[s.filterCat] !== undefined) { countsByCat[s.filterCat] += 1; }
+    });
+    document.querySelectorAll("[data-n]").forEach(function (el) {
+      var key = el.getAttribute("data-n");
+      el.textContent = key === "all" ? String(total) : String(countsByCat[key] || 0);
+    });
+
+    document.querySelectorAll(".filter").forEach(function (btn) {
+      btn.setAttribute("aria-pressed", btn.getAttribute("data-filter") === state.filter ? "true" : "false");
+    });
+
+    var words = state.query.trim().toLowerCase().split(/\s+/).filter(Boolean);
+    var host = document.getElementById("sectionsHost");
+    host.textContent = "";
+    var visibleTotal = 0;
+
+    DATA.phases.forEach(function (phaseObj, phaseIdx) {
+      var phaseSteps = DATA.steps.filter(function (s, idx) {
+        s._idx = idx;
+        if (s.phase !== phaseIdx) { return false; }
+        if (state.filter !== "all" && s.filterCat !== state.filter) { return false; }
+        if (!words.length) { return true; }
+        var hay = (s.title + " " + s.desc + " " + s.short + " " + s.keywords).toLowerCase();
+        return words.every(function (w) { return hay.indexOf(w) !== -1; });
+      });
+      if (!phaseSteps.length) { return; }
+      visibleTotal += phaseSteps.length;
+
+      var sec = document.createElement("section");
+      sec.className = "section";
+      var head = document.createElement("div");
+      head.className = "section-head";
+      var h2 = document.createElement("h2");
+      h2.textContent = phaseObj.title;
+      var stk = document.createElement("span");
+      stk.className = "sticker";
+      stk.style.background = phaseIdx % 2 === 0 ? "var(--stk-yellow)" : "var(--stk-mint)";
+      stk.textContent = phaseSteps.length + " 步";
+      var desc = document.createElement("p");
+      desc.textContent = phaseObj.copy;
+      head.appendChild(h2);
+      head.appendChild(stk);
+      head.appendChild(desc);
+      sec.appendChild(head);
+
+      var cardsWrap = document.createElement("div");
+      cardsWrap.className = "cards";
+
+      phaseSteps.forEach(function (st) {
+        var card = document.createElement("button");
+        card.type = "button";
+        card.className = "card " + (st.tint || "") + (st.wide ? " wide" : "") + (state.visited[st.id] ? " visited" : "");
+
+        var cardStk = document.createElement("span");
+        cardStk.className = "card-stk";
+        var innerStk = document.createElement("span");
+        innerStk.className = "sticker";
+        innerStk.style.background = st.badgeBg || "var(--stk-lilac)";
+        innerStk.textContent = st.sticker;
+        cardStk.appendChild(innerStk);
+
+        var cType = document.createElement("p");
+        cType.className = "card-type";
+        cType.textContent = st.type;
+
+        var h3 = document.createElement("h3");
+        renderSearchHighlighted(h3, st.title, words);
+
+        var pDesc = document.createElement("p");
+        pDesc.className = "desc";
+        renderSearchHighlighted(pDesc, st.desc, words);
+
+        var prereq = document.createElement("p");
+        prereq.className = "prereq";
+        var preB = document.createElement("b");
+        preB.textContent = "开始前：";
+        prereq.appendChild(preB);
+        prereq.appendChild(document.createTextNode(st.prep));
+
+        var foot = document.createElement("div");
+        foot.className = "card-foot";
+        var seen = document.createElement("span");
+        seen.className = "sticker seen";
+        seen.textContent = "已学完";
+        var no = document.createElement("span");
+        no.className = "stepno";
+        no.textContent = "第 " + (st._idx + 1) + " / " + total + " 步";
+        foot.appendChild(seen);
+        foot.appendChild(no);
+
+        card.appendChild(cardStk);
+        card.appendChild(cType);
+        card.appendChild(h3);
+        card.appendChild(pDesc);
+        card.appendChild(prereq);
+        card.appendChild(foot);
+        card.addEventListener("click", function () { openGuideAt(st._idx); });
+        cardsWrap.appendChild(card);
+      });
+
+      sec.appendChild(cardsWrap);
+      host.appendChild(sec);
+    });
+
+    var countEl = document.getElementById("count");
+    countEl.textContent = "";
+    if (visibleTotal !== total) {
+      countEl.appendChild(document.createTextNode("找到 " + visibleTotal + " 个步骤"));
+      var resetBtn = document.createElement("button");
+      resetBtn.type = "button";
+      resetBtn.textContent = "显示全部";
+      resetBtn.addEventListener("click", resetFilters);
+      countEl.appendChild(resetBtn);
+    } else {
+      countEl.textContent = "共 " + total + " 个交互步骤，挑一个开始";
+    }
+    document.getElementById("empty").hidden = visibleTotal > 0;
+    document.getElementById("clearHero").hidden = !state.query.trim();
+  }
+
+  function resetFilters() {
+    state.query = "";
+    state.filter = "all";
+    document.getElementById("search").value = "";
+    document.getElementById("search2").value = "";
+    renderHomeDynamic();
+  }
+
+  function renderToc() {
+    var total = DATA.steps.length;
+    var pct = Math.round(((state.stepIdx + 1) / total) * 100);
+    document.getElementById("progText").textContent = "第 " + (state.stepIdx + 1) + " / " + total + " 步";
+    document.getElementById("fill").style.width = pct + "%";
+    document.getElementById("progBar").setAttribute("aria-valuenow", String(pct));
+    document.getElementById("mProgText").textContent = "第 " + (state.stepIdx + 1) + " / " + total + " 步";
+    document.getElementById("mFill").style.width = pct + "%";
+
+    ["toc", "mToc"].forEach(function (navId) {
+      var nav = document.getElementById(navId);
+      nav.textContent = "";
+      DATA.phases.forEach(function (phaseObj, phaseIdx) {
+        var phLabel = document.createElement("p");
+        phLabel.className = "toc-phase";
+        phLabel.textContent = phaseObj.title;
+        nav.appendChild(phLabel);
+
+        var ol = document.createElement("ol");
+        DATA.steps.forEach(function (st, idx) {
+          if (st.phase !== phaseIdx) { return; }
+          var li = document.createElement("li");
+          var btn = document.createElement("button");
+          btn.type = "button";
+          var isCur = idx === state.stepIdx;
+          var isDone = Boolean(state.visited[st.id]) && !isCur;
+          btn.className = "toc-step" + (isCur ? " current" : "") + (isDone ? " done" : "");
+          var dot = document.createElement("span");
+          dot.className = "dot";
+          dot.textContent = isDone ? "✓" : String(idx + 1);
+          var label = document.createElement("span");
+          label.textContent = st.short;
+          btn.appendChild(dot);
+          btn.appendChild(label);
+          if (isCur) {
+            var here = document.createElement("span");
+            here.className = "here";
+            var stk = document.createElement("span");
+            stk.className = "sticker";
+            stk.textContent = "当前";
+            here.appendChild(stk);
+            btn.appendChild(here);
+          }
+          btn.addEventListener("click", function () {
+            if (navId === "mToc") { document.getElementById("mobileToc").open = false; }
+            openGuideAt(idx);
+          });
+          li.appendChild(btn);
+          ol.appendChild(li);
+        });
+        nav.appendChild(ol);
+      });
+    });
+  }
+
+  function updateRailProfileSummary() {
+    var el = document.getElementById("railProfileSummary");
+    if (!el) { return; }
+    var filled = [];
+    if (state.storeName.trim()) { filled.push(state.storeName.trim()); }
+    if (state.storeDomain.trim()) { filled.push(state.storeDomain.trim()); }
+    if (state.storeWechat.trim()) { filled.push("微信 " + state.storeWechat.trim()); }
+    if (filled.length === 3) {
+      el.textContent = "已配置：" + filled.join(" · ");
+    } else {
+      el.textContent = "已有 " + filled.length + " / 3 项自定义（发给客户前建议先填好避免误发总店）";
+    }
+  }
+
+  function buildCopyBlockEl(blk) {
+    var wrap = document.createElement("div");
+    wrap.className = "prompt" + (blk.danger ? " danger-prompt" : "");
+    var head = document.createElement("div");
+    head.className = "prompt-head";
+    var st = document.createElement("strong");
+    st.textContent = blk.title;
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn btn-primary btn-sm";
+    btn.textContent = "一键复制文案";
+    btn.addEventListener("click", function () { copyText(resolveText(blk.body), true); });
+    head.appendChild(st);
+    head.appendChild(btn);
+    wrap.appendChild(head);
+
+    if (blk.tip) {
+      var tp = document.createElement("p");
+      tp.className = "prompt-tip";
+      tp.textContent = resolveText(blk.tip);
+      wrap.appendChild(tp);
+    }
+    var pre = document.createElement("pre");
+    renderHighlightedPlaceholders(pre, resolveText(blk.body));
+    wrap.appendChild(pre);
+    return wrap;
+  }
+
+  function renderGuideStep() {
+    var st = DATA.steps[state.stepIdx];
+    var host = document.getElementById("stepHost");
+    host.textContent = "";
+
+    var meta = document.createElement("div");
+    meta.className = "step-meta";
+    var stk = document.createElement("span");
+    stk.className = "sticker";
+    stk.textContent = DATA.phases[st.phase].title;
+    var cnt = document.createElement("span");
+    cnt.textContent = "第 " + (state.stepIdx + 1) + " / " + DATA.steps.length + " 步";
+    meta.appendChild(stk);
+    meta.appendChild(cnt);
+    host.appendChild(meta);
+
+    var h1 = document.createElement("h1");
+    h1.id = "stepTitle";
+    h1.textContent = st.title;
+    host.appendChild(h1);
+
+    var intro = document.createElement("p");
+    intro.className = "intro";
+    intro.textContent = st.intro;
+    host.appendChild(intro);
+
+    if (st.facts && st.facts.length) {
+      var fg = document.createElement("div");
+      fg.className = "facts block";
+      st.facts.forEach(function (f) {
+        var fc = document.createElement("div");
+        fc.className = "fact";
+        var s = document.createElement("strong");
+        s.textContent = f.title;
+        var sp = document.createElement("span");
+        sp.textContent = f.body;
+        fc.appendChild(s);
+        fc.appendChild(sp);
+        fg.appendChild(fc);
+      });
+      host.appendChild(fg);
+    }
+
+    if (st.tiers && st.tiers.length) {
+      var tg = document.createElement("div");
+      tg.className = "tiers block";
+      st.tiers.forEach(function (tr) {
+        var tc = document.createElement("div");
+        tc.className = "tier-card";
+        var tStrong = document.createElement("strong");
+        tStrong.textContent = tr.title;
+        var tP = document.createElement("p");
+        tP.textContent = tr.desc;
+        tc.appendChild(tStrong);
+        tc.appendChild(tP);
+        tg.appendChild(tc);
+      });
+      host.appendChild(tg);
+    }
+
+    if (st.table) {
+      var tblBlock = document.createElement("div");
+      tblBlock.className = "block";
+      var tblH = document.createElement("h2");
+      tblH.className = "block-title";
+      tblH.textContent = st.table.title;
+      tblBlock.appendChild(tblH);
+
+      var tblCard = document.createElement("div");
+      tblCard.className = "table-card";
+      var scroller = document.createElement("div");
+      scroller.className = "table-scroll";
+      var table = document.createElement("table");
+      var thead = document.createElement("thead");
+      var htr = document.createElement("tr");
+      st.table.headers.forEach(function (hd) {
+        var th = document.createElement("th");
+        th.textContent = hd;
+        htr.appendChild(th);
+      });
+      thead.appendChild(htr);
+      table.appendChild(thead);
+
+      var tbody = document.createElement("tbody");
+      st.table.rows.forEach(function (r) {
+        var tr = document.createElement("tr");
+        r.forEach(function (cell, idx) {
+          var td = document.createElement("td");
+          if (idx === 0) { td.style.fontWeight = "700"; }
+          td.textContent = cell;
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      scroller.appendChild(table);
+      tblCard.appendChild(scroller);
+      tblBlock.appendChild(tblCard);
+      host.appendChild(tblBlock);
+    }
+
+    if (st.kind === "choice" && st.choices) {
+      var chWrap = document.createElement("div");
+      chWrap.className = "choices block";
+      var fbEl = document.createElement("div");
+      fbEl.className = "note tip";
+      var fbTag = document.createElement("span");
+      fbTag.className = "tag";
+      var fbStk = document.createElement("span");
+      fbStk.className = "sticker";
+      fbStk.textContent = "专属路线提示";
+      fbTag.appendChild(fbStk);
+      var fbText = document.createElement("div");
+
+      function updateChoiceUi() {
+        var matched = st.choices.filter(function (c) { return c.value === state.modeChoice; })[0] || st.choices[0];
+        fbText.textContent = matched.feedback;
+      }
+      st.choices.forEach(function (c) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "choice";
+        btn.setAttribute("aria-pressed", state.modeChoice === c.value ? "true" : "false");
+        var cs = document.createElement("strong");
+        cs.textContent = c.title;
+        var cp = document.createElement("span");
+        cp.className = "copy";
+        cp.textContent = c.copy;
+        btn.appendChild(cs);
+        btn.appendChild(cp);
+        btn.addEventListener("click", function () {
+          state.modeChoice = c.value;
+          saveState();
+          chWrap.querySelectorAll(".choice").forEach(function (other, oi) {
+            other.setAttribute("aria-pressed", st.choices[oi].value === state.modeChoice ? "true" : "false");
+          });
+          updateChoiceUi();
+        });
+        chWrap.appendChild(btn);
+      });
+      updateChoiceUi();
+      fbEl.appendChild(fbTag);
+      fbEl.appendChild(fbText);
+      host.appendChild(chWrap);
+      host.appendChild(fbEl);
+    }
+
+    if (st.kind === "personalize") {
+      var pp = document.createElement("div");
+      pp.className = "profile-panel block";
+      var pGrid = document.createElement("div");
+      pGrid.className = "grid-2";
+
+      var previewPre = document.createElement("pre");
+      var previewCard = document.createElement("div");
+      previewCard.className = "prompt";
+      previewCard.style.marginTop = "16px";
+      previewCard.style.marginBottom = "0";
+      var pvHead = document.createElement("div");
+      pvHead.className = "prompt-head";
+      var pvTitle = document.createElement("strong");
+      pvTitle.textContent = "实时替换预览（发给客户前确保黄色占位符全消失）";
+      var pvCopy = document.createElement("button");
+      pvCopy.type = "button";
+      pvCopy.className = "btn btn-primary btn-sm";
+      pvCopy.textContent = "复制测试一段";
+      var pvTpl = "欢迎来【{{你的店铺名}}】自助选购 AI 会员，24 小时自动发货！直达：{{你的独立域名}} ｜ 售后或代理合作（门槛 {{你的代理门槛价}}）加微信：{{你的微信}}";
+      pvCopy.addEventListener("click", function () { copyText(resolveText(pvTpl), true); });
+      pvHead.appendChild(pvTitle);
+      pvHead.appendChild(pvCopy);
+      previewCard.appendChild(pvHead);
+      previewCard.appendChild(previewPre);
+
+      function refreshPreview() {
+        renderHighlightedPlaceholders(previewPre, resolveText(pvTpl));
+        updateRailProfileSummary();
+      }
+
+      var fieldsSpec = [
+        { key: "storeName", label: "我的店铺名", ph: "例：星辰AI严选" },
+        { key: "storeDomain", label: "我的独立域名", ph: "例：https://starai.store" },
+        { key: "storeWechat", label: "我的售后微信（发给客户看）", ph: "填入你自己的微信号" },
+        { key: "subAgentFee", label: "我的下级代理门槛价", ph: "默认 " + DATA.defaultAgentFee }
+      ];
+      var inlineInputs = [];
+      fieldsSpec.forEach(function (fs) {
+        var lb = document.createElement("label");
+        lb.className = "field";
+        var sp = document.createElement("span");
+        sp.textContent = fs.label;
+        var inp = document.createElement("input");
+        inp.type = "text";
+        inp.placeholder = fs.ph;
+        inp.value = state[fs.key];
+        inp.addEventListener("input", function () {
+          state[fs.key] = inp.value;
+          saveState();
+          syncDialogInputs();
+          refreshPreview();
+        });
+        lb.appendChild(sp);
+        lb.appendChild(inp);
+        pGrid.appendChild(lb);
+        inlineInputs.push({ key: fs.key, el: inp });
+      });
+
+      var pActs = document.createElement("div");
+      pActs.style.display = "flex";
+      pActs.style.flexWrap = "wrap";
+      pActs.style.gap = "8px";
+      pActs.style.marginTop = "12px";
+      var btnSample = document.createElement("button");
+      btnSample.type = "button";
+      btnSample.className = "btn btn-sm";
+      btnSample.textContent = "恢复示例";
+      btnSample.addEventListener("click", function () {
+        applySampleProfile();
+        inlineInputs.forEach(function (item) { item.el.value = state[item.key]; });
+        refreshPreview();
+      });
+      var btnBlank = document.createElement("button");
+      btnBlank.type = "button";
+      btnBlank.className = "btn btn-sm";
+      btnBlank.textContent = "恢复占位符";
+      btnBlank.addEventListener("click", function () {
+        applyBlankProfile();
+        inlineInputs.forEach(function (item) { item.el.value = state[item.key]; });
+        refreshPreview();
+      });
+      pActs.appendChild(btnSample);
+      pActs.appendChild(btnBlank);
+
+      pp.appendChild(pGrid);
+      pp.appendChild(pActs);
+      pp.appendChild(previewCard);
+      host.appendChild(pp);
+      refreshPreview();
+    }
+
+    if (st.links && st.links.length) {
+      var lBlock = document.createElement("div");
+      lBlock.className = "links block";
+      st.links.forEach(function (lk) {
+        var a = document.createElement("a");
+        a.className = "link";
+        a.href = lk.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        var left = document.createElement("div");
+        var b = document.createElement("b");
+        b.textContent = lk.label;
+        var sm = document.createElement("small");
+        sm.textContent = lk.sub;
+        left.appendChild(b);
+        left.appendChild(sm);
+        var ext = document.createElement("span");
+        ext.className = "sticker";
+        ext.textContent = "打开 ↗";
+        a.appendChild(left);
+        a.appendChild(ext);
+        lBlock.appendChild(a);
+      });
+      host.appendChild(lBlock);
+    }
+
+    if (st.bullets && st.bullets.length) {
+      var bBlock = document.createElement("div");
+      bBlock.className = "list block";
+      st.bullets.forEach(function (txt) {
+        var item = document.createElement("div");
+        item.className = "info-item";
+        item.textContent = txt;
+        bBlock.appendChild(item);
+      });
+      host.appendChild(bBlock);
+    }
+
+    if (st.checks && st.checks.length) {
+      var cBlock = document.createElement("div");
+      cBlock.className = "block";
+      var cTitle = document.createElement("h2");
+      cTitle.className = "block-title";
+      cTitle.textContent = "实操核对打勾（本机自动记住）";
+      cBlock.appendChild(cTitle);
+      var listEl = document.createElement("div");
+      listEl.className = "list";
+      if (!state.stepChecks[st.id]) { state.stepChecks[st.id] = {}; }
+
+      st.checks.forEach(function (chkText, ci) {
+        var lb = document.createElement("label");
+        var isTick = Boolean(state.stepChecks[st.id][String(ci)]);
+        lb.className = "tick" + (isTick ? " is-checked" : "");
+        var cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.checked = isTick;
+        var sp = document.createElement("span");
+        sp.className = "tick-text";
+        sp.textContent = chkText;
+        cb.addEventListener("change", function () {
+          state.stepChecks[st.id][String(ci)] = cb.checked;
+          lb.classList.toggle("is-checked", cb.checked);
+          saveState();
+        });
+        lb.appendChild(cb);
+        lb.appendChild(sp);
+        listEl.appendChild(lb);
+      });
+      cBlock.appendChild(listEl);
+      host.appendChild(cBlock);
+    }
+
+    if (st.copyBlocks && st.copyBlocks.length) {
+      var cbBlock = document.createElement("div");
+      cbBlock.className = "block";
+      st.copyBlocks.forEach(function (blk) {
+        cbBlock.appendChild(buildCopyBlockEl(blk));
+      });
+      host.appendChild(cbBlock);
+    }
+
+    if (st.kind === "done" && st.doneGroups) {
+      var dh = document.createElement("div");
+      dh.className = "done-hero";
+      dh.innerHTML = "<span class='burst'><span class='sticker'>大功告成</span></span><h2>准备就绪，可以去发圈出单了！</h2><p>下面是已掌握的关键能力与每日必做提醒：</p>";
+      host.appendChild(dh);
+
+      var dg = document.createElement("div");
+      dg.className = "facts block";
+      st.doneGroups.forEach(function (grp) {
+        var box = document.createElement("div");
+        box.className = "fact";
+        var gs = document.createElement("strong");
+        gs.textContent = grp.title;
+        box.appendChild(gs);
+        grp.items.forEach(function (it) {
+          var row = document.createElement("div");
+          row.style.fontSize = "13.5px";
+          row.style.marginTop = "4px";
+          row.textContent = "• " + it;
+          box.appendChild(row);
+        });
+        dg.appendChild(box);
+      });
+      host.appendChild(dg);
+
+      if (st.seeAlso) {
+        var sa = document.createElement("div");
+        sa.className = "see block";
+        st.seeAlso.forEach(function (item) {
+          var el = item.url ? document.createElement("a") : document.createElement("button");
+          el.className = "see-item";
+          if (item.url) {
+            el.href = item.url;
+            el.target = "_blank";
+            el.rel = "noopener noreferrer";
+          } else {
+            el.type = "button";
+            el.addEventListener("click", function () { openGuideAt(stepIndexById(item.stepId)); });
+          }
+          var s = document.createElement("strong");
+          s.textContent = item.title;
+          var sm = document.createElement("small");
+          sm.textContent = item.desc;
+          el.appendChild(s);
+          el.appendChild(sm);
+          sa.appendChild(el);
+        });
+        host.appendChild(sa);
+      }
+    }
+
+    if (st.note) {
+      var nEl = document.createElement("div");
+      nEl.className = "note " + (st.note.kind || "tip");
+      var nTag = document.createElement("span");
+      nTag.className = "tag";
+      var nStk = document.createElement("span");
+      nStk.className = "sticker";
+      nStk.textContent = st.note.tag;
+      nTag.appendChild(nStk);
+      var nBody = document.createElement("div");
+      nBody.textContent = st.note.text;
+      nEl.appendChild(nTag);
+      nEl.appendChild(nBody);
+      host.appendChild(nEl);
+    }
+
+    document.getElementById("coachText").textContent = st.coach;
+    updateRailProfileSummary();
+
+    var prevBtn = document.getElementById("prevBtn");
+    var nextBtn = document.getElementById("nextBtn");
+    if (state.stepIdx === 0) {
+      prevBtn.disabled = true;
+      document.getElementById("prevTitle").textContent = "";
+    } else {
+      prevBtn.disabled = false;
+      document.getElementById("prevTitle").textContent = DATA.steps[state.stepIdx - 1].short;
+    }
+
+    if (state.stepIdx === DATA.steps.length - 1) {
+      document.getElementById("nextSub").textContent = "全部完成";
+      document.getElementById("nextTitle").textContent = st.button || "返回教程总览页";
+    } else {
+      document.getElementById("nextSub").textContent = "下一步";
+      document.getElementById("nextTitle").textContent = st.button || DATA.steps[state.stepIdx + 1].short;
+    }
+  }
+
+  function syncDialogInputs() {
+    document.getElementById("dlg-store-name").value = state.storeName;
+    document.getElementById("dlg-store-domain").value = state.storeDomain;
+    document.getElementById("dlg-store-wechat").value = state.storeWechat;
+    document.getElementById("dlg-subagent-fee").value = state.subAgentFee;
+  }
+
+  function applySampleProfile() {
+    state.storeName = "星辰AI严选";
+    state.storeDomain = "https://starai.store";
+    state.storeWechat = "starai_kf88";
+    state.subAgentFee = DATA.defaultAgentFee || "";
+    saveState();
+    syncDialogInputs();
+    updateRailProfileSummary();
+    showToast("已填入示例店铺信息，全站文案已实时替换", false);
+  }
+
+  function applyBlankProfile() {
+    state.storeName = "";
+    state.storeDomain = "";
+    state.storeWechat = "";
+    state.subAgentFee = DATA.defaultAgentFee || "";
+    saveState();
+    syncDialogInputs();
+    updateRailProfileSummary();
+    showToast("已恢复占位符模式（清空自定义输入）", false);
+  }
+
+  function openProfileDialog() {
+    syncDialogInputs();
+    document.getElementById("profileDialog").showModal();
+  }
+
+  function bindAllEvents() {
+    document.getElementById("themeToggleBtn").addEventListener("click", function () {
+      var dark = document.documentElement.dataset.theme === "dark";
+      document.documentElement.dataset.theme = dark ? "light" : "dark";
+      safeSet(THEME_KEY, dark ? "light" : "dark");
+      syncThemeIcon();
+    });
+
+    document.getElementById("brandHomeLink").addEventListener("click", function (ev) {
+      ev.preventDefault();
+      openHome();
+    });
+    document.getElementById("navHomeBtn").addEventListener("click", function () { openHome("tutorials"); });
+    document.getElementById("navGuideBtn").addEventListener("click", function () { openGuideAt(state.stepIdx); });
+    document.getElementById("navProfileBtn").addEventListener("click", openProfileDialog);
+    document.getElementById("navFaqBtn").addEventListener("click", function () { openHome("faq"); });
+
+    document.getElementById("originEditProfileBtn").addEventListener("click", openProfileDialog);
+    document.getElementById("originCopyWxBtn").addEventListener("click", function () { copyText(DATA.ownerWechat, false); });
+    document.getElementById("originStartGuideBtn").addEventListener("click", function () { openGuideAt(state.stepIdx); });
+    document.getElementById("resumeStartBtn").addEventListener("click", function () { openGuideAt(state.stepIdx); });
+    document.getElementById("helpEnterGuideBtn").addEventListener("click", function () { openGuideAt(state.stepIdx); });
+    document.getElementById("helpCopyWxBtn").addEventListener("click", function () { copyText(DATA.ownerWechat, false); });
+
+    document.getElementById("railOpenProfileBtn").addEventListener("click", openProfileDialog);
+    document.getElementById("railCopyWxBtn").addEventListener("click", function () { copyText(DATA.ownerWechat, false); });
+    document.getElementById("railHomeBtn").addEventListener("click", function () { openHome(); });
+    document.getElementById("railResetBtn").addEventListener("click", function () {
+      state.visited = {};
+      state.stepChecks = {};
+      state.stepIdx = 0;
+      saveState();
+      openGuideAt(0);
+      showToast("已重置本地学习与核对进度", false);
+    });
+
+    var inpHero = document.getElementById("search");
+    var inpBar = document.getElementById("search2");
+    function onSearch(val, fromBar) {
+      state.query = val;
+      if (inpHero.value !== val) { inpHero.value = val; }
+      if (inpBar.value !== val) { inpBar.value = val; }
+      renderHomeDynamic();
+      if (fromBar) {
+        var tut = document.getElementById("tutorials");
+        if (tut) { tut.scrollIntoView({ behavior: "smooth" }); }
+      }
+    }
+    inpHero.addEventListener("input", function () { onSearch(inpHero.value, false); });
+    inpBar.addEventListener("input", function () { onSearch(inpBar.value, false); });
+    document.getElementById("clearHero").addEventListener("click", function () { resetFilters(); inpHero.focus(); });
+    document.getElementById("clearAllBtn").addEventListener("click", resetFilters);
+
+    document.querySelectorAll(".chips .chip").forEach(function (ch) {
+      ch.addEventListener("click", function () {
+        state.filter = "all";
+        onSearch(ch.getAttribute("data-q") || "", true);
+      });
+    });
+
+    document.querySelectorAll(".filter").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        state.filter = btn.getAttribute("data-filter") || "all";
+        renderHomeDynamic();
+      });
+    });
+
+    document.getElementById("prevBtn").addEventListener("click", function () {
+      if (state.stepIdx > 0) { openGuideAt(state.stepIdx - 1); }
+    });
+    document.getElementById("nextBtn").addEventListener("click", function () {
+      if (state.stepIdx < DATA.steps.length - 1) {
+        openGuideAt(state.stepIdx + 1);
+      } else {
+        openHome();
+      }
+    });
+
+    document.addEventListener("keydown", function (e) {
+      var tag = document.activeElement ? document.activeElement.tagName : "";
+      if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag) || document.querySelector("dialog[open]")) { return; }
+      if (state.view === "home" && e.key === "/") {
+        e.preventDefault();
+        inpHero.focus();
+        inpHero.select();
+      } else if (state.view === "guide") {
+        if (e.key === "ArrowLeft" && state.stepIdx > 0) {
+          e.preventDefault();
+          openGuideAt(state.stepIdx - 1);
+        } else if (e.key === "ArrowRight" && state.stepIdx < DATA.steps.length - 1) {
+          e.preventDefault();
+          openGuideAt(state.stepIdx + 1);
+        }
+      }
+    });
+
+    var dlg = document.getElementById("profileDialog");
+    [["dlg-store-name", "storeName"], ["dlg-store-domain", "storeDomain"], ["dlg-store-wechat", "storeWechat"], ["dlg-subagent-fee", "subAgentFee"]].forEach(function (pair) {
+      document.getElementById(pair[0]).addEventListener("input", function (ev) {
+        state[pair[1]] = ev.target.value;
+        saveState();
+        updateRailProfileSummary();
+        if (state.view === "guide") { renderGuideStep(); }
+      });
+    });
+    document.getElementById("profileDialogClose").addEventListener("click", function () { dlg.close(); });
+    document.getElementById("dlgSaveCloseBtn").addEventListener("click", function () {
+      dlg.close();
+      if (state.view === "guide") { renderGuideStep(); }
+      showToast("分站信息已保存，全站文案已更新！", false);
+    });
+    document.getElementById("dlgFillSampleBtn").addEventListener("click", function () {
+      applySampleProfile();
+      if (state.view === "guide") { renderGuideStep(); }
+    });
+    document.getElementById("dlgResetBlankBtn").addEventListener("click", function () {
+      applyBlankProfile();
+      if (state.view === "guide") { renderGuideStep(); }
+    });
+
+    var supBtn = document.getElementById("supportBtn");
+    var supPanel = document.getElementById("supportPanel");
+    supBtn.addEventListener("click", function () {
+      var willOpen = supPanel.hidden;
+      supPanel.hidden = !willOpen;
+      supBtn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    });
+    document.getElementById("supportCloseBtn").addEventListener("click", function () {
+      supPanel.hidden = true;
+      supBtn.setAttribute("aria-expanded", "false");
+    });
+    document.getElementById("panelCopyWxBtn").addEventListener("click", function () { copyText(DATA.ownerWechat, false); });
+    document.getElementById("panelOpenProfileBtn").addEventListener("click", function () {
+      supPanel.hidden = true;
+      supBtn.setAttribute("aria-expanded", "false");
+      openProfileDialog();
+    });
+  }
+
+  loadState();
+  syncThemeIcon();
+  renderTicker();
+  renderRoutes();
+  renderFaqs();
+  renderHomeDynamic();
+  bindAllEvents();
+})();
+</script>
+</body>
+</html>
